@@ -3,14 +3,14 @@
     "id": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
     "createdByTeacherId": "80000000-0000-4000-8000-000000000001",
     "title": "기본간호 1주차 복습 문제집",
-    "description": "활력징후와 기본 안전 간호를 복습하는 문제집",
+    "description": "활력징후, 안전간호, 감염관리 기초를 점검하는 문제집",
     "status": "published",
     "timeLimitMinutes": 40,
     "passScore": 70,
-    "questionCount": 4,
+    "questionCount": 5,
     "totalPoints": 100,
-    "createdAt": "2026-06-10T09:00:00+09:00",
-    "updatedAt": "2026-06-12T10:00:00+09:00",
+    "createdAt": "2026-06-10T00:00:00Z",
+    "updatedAt": "2026-06-12T01:00:00Z",
     "deletedAt": null,
     "workbookQuestions": [
       {
@@ -18,10 +18,10 @@
         "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
         "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
         "sequence": 1,
-        "points": 25,
+        "points": 20,
         "isRequired": true,
-        "createdAt": "2026-06-10T09:05:00+09:00",
-        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "createdAt": "2026-06-10T00:05:00Z",
+        "updatedAt": "2026-06-10T00:05:00Z",
         "deletedAt": null
       },
       {
@@ -29,10 +29,10 @@
         "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
         "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
         "sequence": 2,
-        "points": 25,
+        "points": 20,
         "isRequired": true,
-        "createdAt": "2026-06-10T09:05:00+09:00",
-        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "createdAt": "2026-06-10T00:05:00Z",
+        "updatedAt": "2026-06-10T00:05:00Z",
         "deletedAt": null
       },
       {
@@ -40,10 +40,10 @@
         "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
         "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
         "sequence": 3,
-        "points": 25,
+        "points": 20,
         "isRequired": true,
-        "createdAt": "2026-06-10T09:05:00+09:00",
-        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "createdAt": "2026-06-10T00:05:00Z",
+        "updatedAt": "2026-06-10T00:05:00Z",
         "deletedAt": null
       },
       {
@@ -51,10 +51,21 @@
         "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
         "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4",
         "sequence": 4,
-        "points": 25,
+        "points": 20,
         "isRequired": true,
-        "createdAt": "2026-06-10T09:05:00+09:00",
-        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "createdAt": "2026-06-10T00:05:00Z",
+        "updatedAt": "2026-06-10T00:05:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd5",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb10",
+        "sequence": 5,
+        "points": 20,
+        "isRequired": true,
+        "createdAt": "2026-06-10T00:05:00Z",
+        "updatedAt": "2026-06-10T00:05:00Z",
         "deletedAt": null
       }
     ],
@@ -65,12 +76,26 @@
         "cohortId": "11111111-1111-4111-8111-111111111111",
         "assignedByTeacherId": "80000000-0000-4000-8000-000000000001",
         "status": "open",
-        "opensAt": "2026-06-12T09:00:00+09:00",
-        "closesAt": "2026-06-30T23:59:59+09:00",
+        "opensAt": "2026-06-12T00:00:00Z",
+        "closesAt": "2026-06-30T14:59:59Z",
         "maxAttempts": 3,
+        "submissionCount": 3,
+        "createdAt": "2026-06-12T00:00:00Z",
+        "updatedAt": "2026-06-12T00:00:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+        "cohortId": "44444444-4444-4444-8444-444444444444",
+        "assignedByTeacherId": "80000000-0000-4000-8000-000000000001",
+        "status": "open",
+        "opensAt": "2026-06-15T00:00:00Z",
+        "closesAt": "2026-06-29T14:59:59Z",
+        "maxAttempts": 2,
         "submissionCount": 2,
-        "createdAt": "2026-06-12T09:00:00+09:00",
-        "updatedAt": "2026-06-12T09:00:00+09:00",
+        "createdAt": "2026-06-14T00:00:00Z",
+        "updatedAt": "2026-06-15T00:00:00Z",
         "deletedAt": null
       }
     ]
@@ -79,39 +104,239 @@
     "id": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
     "createdByTeacherId": "80000000-0000-4000-8000-000000000001",
     "title": "감염관리 핵심 문제집",
-    "description": "무균술과 손 위생을 중심으로 구성한 문제집",
-    "status": "draft",
-    "timeLimitMinutes": 30,
+    "description": "무균술, 손 위생, 보호구 착용 순서를 다루는 문제집",
+    "status": "published",
+    "timeLimitMinutes": 35,
     "passScore": 80,
-    "questionCount": 2,
+    "questionCount": 3,
     "totalPoints": 100,
-    "createdAt": "2026-06-15T09:00:00+09:00",
-    "updatedAt": "2026-06-15T11:00:00+09:00",
+    "createdAt": "2026-06-15T00:00:00Z",
+    "updatedAt": "2026-06-16T02:00:00Z",
     "deletedAt": null,
     "workbookQuestions": [
       {
-        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd5",
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd6",
         "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
         "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
         "sequence": 1,
-        "points": 50,
+        "points": 30,
         "isRequired": true,
-        "createdAt": "2026-06-15T09:10:00+09:00",
-        "updatedAt": "2026-06-15T09:10:00+09:00",
+        "createdAt": "2026-06-15T00:10:00Z",
+        "updatedAt": "2026-06-15T00:10:00Z",
         "deletedAt": null
       },
       {
-        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd6",
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd7",
         "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
         "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb5",
         "sequence": 2,
-        "points": 50,
+        "points": 30,
         "isRequired": true,
-        "createdAt": "2026-06-15T09:10:00+09:00",
-        "updatedAt": "2026-06-15T09:10:00+09:00",
+        "createdAt": "2026-06-15T00:10:00Z",
+        "updatedAt": "2026-06-15T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd8",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb7",
+        "sequence": 3,
+        "points": 40,
+        "isRequired": true,
+        "createdAt": "2026-06-15T00:10:00Z",
+        "updatedAt": "2026-06-15T00:10:00Z",
         "deletedAt": null
       }
     ],
-    "assignments": []
+    "assignments": [
+      {
+        "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
+        "cohortId": "22222222-2222-4222-8222-222222222222",
+        "assignedByTeacherId": "80000000-0000-4000-8000-000000000001",
+        "status": "scheduled",
+        "opensAt": "2026-09-03T00:00:00Z",
+        "closesAt": "2026-09-17T14:59:59Z",
+        "maxAttempts": 2,
+        "submissionCount": 0,
+        "createdAt": "2026-06-16T02:00:00Z",
+        "updatedAt": "2026-06-16T02:00:00Z",
+        "deletedAt": null
+      }
+    ]
+  },
+  {
+    "id": "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+    "createdByTeacherId": "80000000-0000-4000-8000-000000000001",
+    "title": "실습 전 핵심 술기 점검",
+    "description": "투약, 산소요법, 욕창 예방을 점검하는 실습 대비 문제집",
+    "status": "published",
+    "timeLimitMinutes": 50,
+    "passScore": 75,
+    "questionCount": 4,
+    "totalPoints": 100,
+    "createdAt": "2026-06-17T00:00:00Z",
+    "updatedAt": "2026-06-17T03:30:00Z",
+    "deletedAt": null,
+    "workbookQuestions": [
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd9",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb6",
+        "sequence": 1,
+        "points": 25,
+        "isRequired": true,
+        "createdAt": "2026-06-17T00:10:00Z",
+        "updatedAt": "2026-06-17T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd10",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb8",
+        "sequence": 2,
+        "points": 25,
+        "isRequired": true,
+        "createdAt": "2026-06-17T00:10:00Z",
+        "updatedAt": "2026-06-17T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd11",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb9",
+        "sequence": 3,
+        "points": 30,
+        "isRequired": true,
+        "createdAt": "2026-06-17T00:10:00Z",
+        "updatedAt": "2026-06-17T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd12",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb10",
+        "sequence": 4,
+        "points": 20,
+        "isRequired": true,
+        "createdAt": "2026-06-17T00:10:00Z",
+        "updatedAt": "2026-06-17T00:10:00Z",
+        "deletedAt": null
+      }
+    ],
+    "assignments": [
+      {
+        "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee4",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc3",
+        "cohortId": "55555555-5555-4555-8555-555555555555",
+        "assignedByTeacherId": "80000000-0000-4000-8000-000000000001",
+        "status": "scheduled",
+        "opensAt": "2026-07-01T00:00:00Z",
+        "closesAt": "2026-07-10T14:59:59Z",
+        "maxAttempts": 3,
+        "submissionCount": 0,
+        "createdAt": "2026-06-17T03:30:00Z",
+        "updatedAt": "2026-06-17T03:30:00Z",
+        "deletedAt": null
+      }
+    ]
+  },
+  {
+    "id": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+    "createdByTeacherId": "80000000-0000-4000-8000-000000000001",
+    "title": "2025년 4기 최종 모의고사",
+    "description": "수료 기수 대상 최종 성적 확인용 모의고사",
+    "status": "archived",
+    "timeLimitMinutes": 60,
+    "passScore": 70,
+    "questionCount": 6,
+    "totalPoints": 100,
+    "createdAt": "2026-01-15T00:00:00Z",
+    "updatedAt": "2026-03-01T00:00:00Z",
+    "deletedAt": null,
+    "workbookQuestions": [
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd13",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+        "sequence": 1,
+        "points": 15,
+        "isRequired": true,
+        "createdAt": "2026-01-15T00:10:00Z",
+        "updatedAt": "2026-01-15T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd14",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+        "sequence": 2,
+        "points": 15,
+        "isRequired": true,
+        "createdAt": "2026-01-15T00:10:00Z",
+        "updatedAt": "2026-01-15T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd15",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
+        "sequence": 3,
+        "points": 20,
+        "isRequired": true,
+        "createdAt": "2026-01-15T00:10:00Z",
+        "updatedAt": "2026-01-15T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd16",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb6",
+        "sequence": 4,
+        "points": 20,
+        "isRequired": true,
+        "createdAt": "2026-01-15T00:10:00Z",
+        "updatedAt": "2026-01-15T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd17",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb8",
+        "sequence": 5,
+        "points": 15,
+        "isRequired": true,
+        "createdAt": "2026-01-15T00:10:00Z",
+        "updatedAt": "2026-01-15T00:10:00Z",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-dddddddddd18",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb10",
+        "sequence": 6,
+        "points": 15,
+        "isRequired": true,
+        "createdAt": "2026-01-15T00:10:00Z",
+        "updatedAt": "2026-01-15T00:10:00Z",
+        "deletedAt": null
+      }
+    ],
+    "assignments": [
+      {
+        "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee5",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc4",
+        "cohortId": "33333333-3333-4333-8333-333333333333",
+        "assignedByTeacherId": "80000000-0000-4000-8000-000000000001",
+        "status": "closed",
+        "opensAt": "2026-02-20T00:00:00Z",
+        "closesAt": "2026-02-21T14:59:59Z",
+        "maxAttempts": 1,
+        "submissionCount": 1,
+        "createdAt": "2026-02-18T00:00:00Z",
+        "updatedAt": "2026-02-22T00:00:00Z",
+        "deletedAt": null
+      }
+    ]
   }
 ]
