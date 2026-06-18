@@ -1,0 +1,176 @@
+{
+  "submissions": [
+    {
+      "id": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+      "workbookAssignmentId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1",
+      "studentId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+      "attemptNo": 1,
+      "status": "graded",
+      "startedAt": "2026-06-18T09:10:00+09:00",
+      "submittedAt": "2026-06-18T09:38:00+09:00",
+      "gradedAt": "2026-06-18T09:38:01+09:00",
+      "totalPoints": 100,
+      "earnedPoints": 75,
+      "score": 75,
+      "correctCount": 3,
+      "wrongCount": 1,
+      "createdAt": "2026-06-18T09:38:01+09:00",
+      "updatedAt": "2026-06-18T09:38:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+      "workbookAssignmentId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1",
+      "studentId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
+      "attemptNo": 1,
+      "status": "graded",
+      "startedAt": "2026-06-18T10:00:00+09:00",
+      "submittedAt": "2026-06-18T10:26:00+09:00",
+      "gradedAt": "2026-06-18T10:26:01+09:00",
+      "totalPoints": 100,
+      "earnedPoints": 100,
+      "score": 100,
+      "correctCount": 4,
+      "wrongCount": 0,
+      "createdAt": "2026-06-18T10:26:01+09:00",
+      "updatedAt": "2026-06-18T10:26:01+09:00",
+      "deletedAt": null
+    }
+  ],
+  "submissionAnswers": [
+    {
+      "id": "77777777-7777-4777-8777-777777777771",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd1",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+      "answer": {
+        "selectedChoiceKeys": ["1"]
+      },
+      "isCorrect": true,
+      "earnedPoints": 25,
+      "gradedAt": "2026-06-18T09:38:01+09:00",
+      "createdAt": "2026-06-18T09:38:01+09:00",
+      "updatedAt": "2026-06-18T09:38:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777772",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd2",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+      "answer": {
+        "selectedChoiceKeys": ["2"]
+      },
+      "isCorrect": true,
+      "earnedPoints": 25,
+      "gradedAt": "2026-06-18T09:38:01+09:00",
+      "createdAt": "2026-06-18T09:38:01+09:00",
+      "updatedAt": "2026-06-18T09:38:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777773",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd3",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
+      "answer": {
+        "selectedChoiceKeys": ["1"]
+      },
+      "isCorrect": false,
+      "earnedPoints": 0,
+      "gradedAt": "2026-06-18T09:38:01+09:00",
+      "createdAt": "2026-06-18T09:38:01+09:00",
+      "updatedAt": "2026-06-18T09:38:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777774",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff1",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd4",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4",
+      "answer": {
+        "selectedChoiceKeys": ["3"]
+      },
+      "isCorrect": true,
+      "earnedPoints": 25,
+      "gradedAt": "2026-06-18T09:38:01+09:00",
+      "createdAt": "2026-06-18T09:38:01+09:00",
+      "updatedAt": "2026-06-18T09:38:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777775",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd1",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+      "answer": {
+        "selectedChoiceKeys": ["1"]
+      },
+      "isCorrect": true,
+      "earnedPoints": 25,
+      "gradedAt": "2026-06-18T10:26:01+09:00",
+      "createdAt": "2026-06-18T10:26:01+09:00",
+      "updatedAt": "2026-06-18T10:26:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777776",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd2",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+      "answer": {
+        "selectedChoiceKeys": ["2"]
+      },
+      "isCorrect": true,
+      "earnedPoints": 25,
+      "gradedAt": "2026-06-18T10:26:01+09:00",
+      "createdAt": "2026-06-18T10:26:01+09:00",
+      "updatedAt": "2026-06-18T10:26:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd3",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
+      "answer": {
+        "selectedChoiceKeys": ["2"]
+      },
+      "isCorrect": true,
+      "earnedPoints": 25,
+      "gradedAt": "2026-06-18T10:26:01+09:00",
+      "createdAt": "2026-06-18T10:26:01+09:00",
+      "updatedAt": "2026-06-18T10:26:01+09:00",
+      "deletedAt": null
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777778",
+      "submissionId": "ffffffff-ffff-4fff-8fff-fffffffffff2",
+      "workbookQuestionId": "dddddddd-dddd-4ddd-8ddd-ddddddddddd4",
+      "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4",
+      "answer": {
+        "selectedChoiceKeys": ["3"]
+      },
+      "isCorrect": true,
+      "earnedPoints": 25,
+      "gradedAt": "2026-06-18T10:26:01+09:00",
+      "createdAt": "2026-06-18T10:26:01+09:00",
+      "updatedAt": "2026-06-18T10:26:01+09:00",
+      "deletedAt": null
+    }
+  ],
+  "summary": [
+    {
+      "cohortId": "11111111-1111-4111-8111-111111111111",
+      "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+      "assignmentId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1",
+      "studentCount": 3,
+      "submittedStudentCount": 2,
+      "notSubmittedStudentCount": 1,
+      "averageScore": 87.5,
+      "highestScore": 100,
+      "lowestScore": 75,
+      "passCount": 2
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+[
+  {
+    "id": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+    "createdByTeacherId": "80000000-0000-4000-8000-000000000001",
+    "title": "기본간호 1주차 복습 문제집",
+    "description": "활력징후와 기본 안전 간호를 복습하는 문제집",
+    "status": "published",
+    "timeLimitMinutes": 40,
+    "passScore": 70,
+    "questionCount": 4,
+    "totalPoints": 100,
+    "createdAt": "2026-06-10T09:00:00+09:00",
+    "updatedAt": "2026-06-12T10:00:00+09:00",
+    "deletedAt": null,
+    "workbookQuestions": [
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd1",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+        "sequence": 1,
+        "points": 25,
+        "isRequired": true,
+        "createdAt": "2026-06-10T09:05:00+09:00",
+        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd2",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+        "sequence": 2,
+        "points": 25,
+        "isRequired": true,
+        "createdAt": "2026-06-10T09:05:00+09:00",
+        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd3",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
+        "sequence": 3,
+        "points": 25,
+        "isRequired": true,
+        "createdAt": "2026-06-10T09:05:00+09:00",
+        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd4",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4",
+        "sequence": 4,
+        "points": 25,
+        "isRequired": true,
+        "createdAt": "2026-06-10T09:05:00+09:00",
+        "updatedAt": "2026-06-10T09:05:00+09:00",
+        "deletedAt": null
+      }
+    ],
+    "assignments": [
+      {
+        "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc1",
+        "cohortId": "11111111-1111-4111-8111-111111111111",
+        "assignedByTeacherId": "80000000-0000-4000-8000-000000000001",
+        "status": "open",
+        "opensAt": "2026-06-12T09:00:00+09:00",
+        "closesAt": "2026-06-30T23:59:59+09:00",
+        "maxAttempts": 3,
+        "submissionCount": 2,
+        "createdAt": "2026-06-12T09:00:00+09:00",
+        "updatedAt": "2026-06-12T09:00:00+09:00",
+        "deletedAt": null
+      }
+    ]
+  },
+  {
+    "id": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
+    "createdByTeacherId": "80000000-0000-4000-8000-000000000001",
+    "title": "감염관리 핵심 문제집",
+    "description": "무균술과 손 위생을 중심으로 구성한 문제집",
+    "status": "draft",
+    "timeLimitMinutes": 30,
+    "passScore": 80,
+    "questionCount": 2,
+    "totalPoints": 100,
+    "createdAt": "2026-06-15T09:00:00+09:00",
+    "updatedAt": "2026-06-15T11:00:00+09:00",
+    "deletedAt": null,
+    "workbookQuestions": [
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd5",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
+        "sequence": 1,
+        "points": 50,
+        "isRequired": true,
+        "createdAt": "2026-06-15T09:10:00+09:00",
+        "updatedAt": "2026-06-15T09:10:00+09:00",
+        "deletedAt": null
+      },
+      {
+        "id": "dddddddd-dddd-4ddd-8ddd-ddddddddddd6",
+        "workbookId": "cccccccc-cccc-4ccc-8ccc-ccccccccccc2",
+        "questionId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb5",
+        "sequence": 2,
+        "points": 50,
+        "isRequired": true,
+        "createdAt": "2026-06-15T09:10:00+09:00",
+        "updatedAt": "2026-06-15T09:10:00+09:00",
+        "deletedAt": null
+      }
+    ],
+    "assignments": []
+  }
+]
