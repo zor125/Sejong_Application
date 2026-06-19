@@ -10,6 +10,7 @@ type WorkbookCardProps = {
 const statusText: Record<Workbook['status'], string> = {
   notStarted: '미풀이',
   inProgress: '풀이 중',
+  retrying: '다시 푸는 중',
   completed: '완료',
 };
 
@@ -21,7 +22,13 @@ export function WorkbookCard({ workbook, onPress }: WorkbookCardProps) {
       <View style={styles.content}>
         <View style={styles.topRow}>
           <Text style={styles.subject}>{workbook.subject}</Text>
-          <Text style={[styles.status, workbook.status === 'completed' && styles.completedStatus]}>
+          <Text
+            style={[
+              styles.status,
+              workbook.status === 'completed' && styles.completedStatus,
+              workbook.status === 'retrying' && styles.retryingStatus,
+            ]}
+          >
             {statusText[workbook.status]}
           </Text>
         </View>
@@ -80,6 +87,10 @@ const styles = StyleSheet.create({
   completedStatus: {
     color: '#1D4ED8',
     backgroundColor: '#DBEAFE',
+  },
+  retryingStatus: {
+    color: '#7C3AED',
+    backgroundColor: '#F3E8FF',
   },
   title: {
     color: '#172554',

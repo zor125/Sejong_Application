@@ -9,6 +9,7 @@ import {
   mockStudent,
   mockWorkbooks,
 } from '../mock/studentMockData';
+import { useSolveProgress } from '../state/SolveProgressContext';
 import type { ScreenProps } from '../types/navigation';
 import type { MainTab } from '../types/student';
 import { ProfileScreen } from './ProfileScreen';
@@ -23,6 +24,7 @@ const tabTitle: Record<MainTab, string> = {
 
 export function MainScreen({ navigation, route }: ScreenProps<'Main'>) {
   const [activeTab, setActiveTab] = useState<MainTab>(route.params.initialTab ?? 'workbooks');
+  const { getProgress, progressList } = useSolveProgress();
 
   useEffect(() => {
     if (route.params.initialTab) {
@@ -36,8 +38,13 @@ export function MainScreen({ navigation, route }: ScreenProps<'Main'>) {
   );
 
   const cohortWorkbooks = useMemo(
-    () => mockWorkbooks.filter((workbook) => workbook.cohortId === cohort.id),
-    [cohort.id],
+    () => mockWorkbooks
+      .filter((workbook) => workbook.cohortId === cohort.id)
+      .map((workbook) => ({
+        ...workbook,
+        status: getProgress(workbook.id)?.status ?? workbook.status,
+      })),
+    [cohort.id, getProgress, progressList],
   );
 
   const cohortResults = useMemo(

@@ -2,17 +2,21 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '../components/PrimaryButton';
 import { mockWorkbooks } from '../mock/studentMockData';
+import { useSolveProgress } from '../state/SolveProgressContext';
 import type { ScreenProps } from '../types/navigation';
 import type { WorkbookStatus } from '../types/student';
 
 const statusText: Record<WorkbookStatus, string> = {
   notStarted: '미풀이',
   inProgress: '풀이 중',
+  retrying: '다시 푸는 중',
   completed: '완료',
 };
 
 export function WorkbookDetailScreen({ navigation, route }: ScreenProps<'WorkbookDetail'>) {
   const workbook = mockWorkbooks.find((item) => item.id === route.params.workbookId);
+  const { getProgress } = useSolveProgress();
+  const solveProgress = getProgress(route.params.workbookId);
 
   if (!workbook) {
     return (
@@ -23,17 +27,38 @@ export function WorkbookDetailScreen({ navigation, route }: ScreenProps<'Workboo
     );
   }
 
+  const effectiveStatus: WorkbookStatus = solveProgress?.status ?? workbook.status;
+  const buttonLabel = solveProgress?.status === 'retrying'
+    ? '다시 풀기 이어하기'
+    : solveProgress?.status === 'inProgress'
+      ? '풀이 이어하기'
+    : effectiveStatus === 'completed'
+      ? '다시 풀기'
+      : '풀이 시작';
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.heroCard}>
           <View style={styles.badgeRow}>
             <Text style={styles.subject}>{workbook.subject}</Text>
-            <Text style={styles.status}>{statusText[workbook.status]}</Text>
+            <Text style={styles.status}>{statusText[effectiveStatus]}</Text>
           </View>
           <Text style={styles.title}>{workbook.title}</Text>
           <Text style={styles.description}>{workbook.description}</Text>
         </View>
+
+        {solveProgress?.status === 'inProgress' || solveProgress?.status === 'retrying' ? (
+          <View style={styles.progressCard}>
+            <Text style={styles.progressTitle}>
+              {solveProgress.status === 'retrying' ? '다시 푸는 중' : '풀이 진행 중'}
+            </Text>
+            <Text style={styles.progressDescription}>
+              {solveProgress.currentQuestionIndex + 1}번 문제부터 이어서 풀 수 있습니다.
+              {' '}저장된 답안 {solveProgress.answers.length}개
+            </Text>
+          </View>
+        ) : null}
 
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>문제집 정보</Text>
@@ -59,7 +84,7 @@ export function WorkbookDetailScreen({ navigation, route }: ScreenProps<'Workboo
           <Text style={styles.sectionTitle}>풀이 안내</Text>
           <Text style={styles.guideText}>• 선택한 답안은 문제를 이동해도 유지됩니다.</Text>
           <Text style={styles.guideText}>• 마지막 문제에서 제출할 수 있습니다.</Text>
-          <Text style={styles.guideText}>• 이번 데모에서는 실제 채점과 저장을 하지 않습니다.</Text>
+          <Text style={styles.guideText}>• 진행 상태는 앱을 종료하기 전까지 임시 저장됩니다.</Text>
         </View>
       </ScrollView>
 
@@ -67,7 +92,7 @@ export function WorkbookDetailScreen({ navigation, route }: ScreenProps<'Workboo
         <PrimaryButton
           onPress={() => navigation.navigate('WorkbookSolve', { workbookId: workbook.id })}
         >
-          풀이 시작
+          {buttonLabel}
         </PrimaryButton>
       </View>
     </View>
@@ -161,6 +186,24 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 22,
     backgroundColor: '#EFF6FF',
+  },
+  progressCard: {
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#93C5FD',
+    borderRadius: 20,
+    backgroundColor: '#EFF6FF',
+  },
+  progressTitle: {
+    color: '#1D4ED8',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  progressDescription: {
+    marginTop: 7,
+    color: '#475569',
+    fontSize: 13,
+    lineHeight: 20,
   },
   guideText: {
     marginBottom: 8,

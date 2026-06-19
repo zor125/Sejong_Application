@@ -1,5 +1,6 @@
 import type {
   Cohort,
+  SolveProgress,
   Student,
   SubmissionRecord,
   Workbook,
@@ -225,6 +226,21 @@ export const mockSubmissionHistory: SubmissionRecord[] = [
         selectedChoiceId: 'choice-2-2-2',
       },
     ]),
+  },
+];
+
+export const mockSolveProgress: SolveProgress[] = [
+  {
+    workbookId: 'workbook-2',
+    currentQuestionIndex: 1,
+    answers: [
+      {
+        questionId: 'question-2-1',
+        selectedChoiceId: 'choice-2-1-2',
+      },
+    ],
+    status: 'inProgress',
+    updatedAt: '2026-06-18T14:10:00.000Z',
   },
 ];
 
