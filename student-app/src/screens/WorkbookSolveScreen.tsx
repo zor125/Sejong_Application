@@ -1,19 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '../components/PrimaryButton';
 import { QuestionCard } from '../components/QuestionCard';
 import { mockWorkbooks } from '../mock/studentMockData';
+import { useSolveProgress } from '../state/SolveProgressContext';
 import { useSubmissionHistory } from '../state/SubmissionHistoryContext';
 import type { ScreenProps } from '../types/navigation';
 import type { StudentAnswer } from '../types/student';
 import { gradeWorkbook } from '../utils/gradeWorkbook';
+import { createInitialSolveState, upsertStudentAnswer } from '../utils/solveProgress';
 
 export function WorkbookSolveScreen({ navigation, route }: ScreenProps<'WorkbookSolve'>) {
   const workbook = mockWorkbooks.find((item) => item.id === route.params.workbookId);
   const { addSubmission } = useSubmissionHistory();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<StudentAnswer[]>([]);
+  const { completeProgress, getProgress, saveProgress, startProgress } = useSolveProgress();
+  const savedProgress = getProgress(route.params.workbookId);
+  const initialState = workbook
+    ? createInitialSolveState(workbook, savedProgress)
+    : { currentQuestionIndex: 0, answers: [] as StudentAnswer[] };
+  const [currentIndex, setCurrentIndex] = useState(initialState.currentQuestionIndex);
+  const [answers, setAnswers] = useState<StudentAnswer[]>(initialState.answers);
+
+  useEffect(() => {
+    if (workbook) {
+      const startStatus = savedProgress?.status === 'completed'
+        || (!savedProgress && workbook.status === 'completed')
+        ? 'retrying'
+        : 'inProgress';
+
+      startProgress(workbook.id, startStatus);
+    }
+  }, [savedProgress, startProgress, workbook]);
 
   if (!workbook || workbook.questions.length === 0) {
     return (
@@ -30,16 +48,22 @@ export function WorkbookSolveScreen({ navigation, route }: ScreenProps<'Workbook
   const progress = ((currentIndex + 1) / workbook.questions.length) * 100;
 
   const selectChoice = (selectedChoiceId: string) => {
-    setAnswers((previousAnswers) => [
-      ...previousAnswers.filter((answer) => answer.questionId !== currentQuestion.id),
-      { questionId: currentQuestion.id, selectedChoiceId },
-    ]);
+    const nextAnswers = upsertStudentAnswer(answers, currentQuestion.id, selectedChoiceId);
+
+    setAnswers(nextAnswers);
+    saveProgress(workbook.id, currentIndex, nextAnswers);
+  };
+
+  const moveToQuestion = (nextIndex: number) => {
+    setCurrentIndex(nextIndex);
+    saveProgress(workbook.id, nextIndex, answers);
   };
 
   const submit = () => {
     const result = gradeWorkbook(workbook, answers);
 
     addSubmission(result);
+    completeProgress(workbook.id, answers);
     navigation.replace('Result', { result });
   };
 
@@ -69,7 +93,7 @@ export function WorkbookSolveScreen({ navigation, route }: ScreenProps<'Workbook
           <PrimaryButton
             variant="light"
             disabled={currentIndex === 0}
-            onPress={() => setCurrentIndex((index) => index - 1)}
+            onPress={() => moveToQuestion(currentIndex - 1)}
           >
             이전 문제
           </PrimaryButton>
@@ -80,7 +104,7 @@ export function WorkbookSolveScreen({ navigation, route }: ScreenProps<'Workbook
           ) : (
             <PrimaryButton
               disabled={!currentAnswer}
-              onPress={() => setCurrentIndex((index) => index + 1)}
+              onPress={() => moveToQuestion(currentIndex + 1)}
             >
               다음 문제
             </PrimaryButton>

@@ -12,7 +12,7 @@ export type Cohort = {
   period: string;
 };
 
-export type WorkbookStatus = 'notStarted' | 'inProgress' | 'completed';
+export type WorkbookStatus = 'notStarted' | 'inProgress' | 'retrying' | 'completed';
 
 export type Choice = {
   id: string;
@@ -43,6 +43,16 @@ export type Workbook = {
 export type StudentAnswer = {
   questionId: string;
   selectedChoiceId: string;
+};
+
+export type SolveProgressStatus = 'inProgress' | 'retrying' | 'completed';
+
+export type SolveProgress = {
+  workbookId: string;
+  currentQuestionIndex: number;
+  answers: StudentAnswer[];
+  status: SolveProgressStatus;
+  updatedAt: string;
 };
 
 export type GradedAnswer = {
