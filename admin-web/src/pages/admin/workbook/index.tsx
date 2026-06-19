@@ -72,15 +72,7 @@ const statusLabels: Record<ContentStatus, string> = {
   archived: '보관',
 };
 
-const getQuestionText = (question: QuestionRow) => question.content || question.stem || '';
-
-const getQuestionTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    multiple_choice: '객관식',
-  };
-
-  return labels[type] ?? type;
-};
+const getQuestionText = (question: QuestionRow) => question.content || question.stem || '문제 내용 없음';
 
 const createTimestamp = () => new Date().toISOString();
 
@@ -106,6 +98,24 @@ const modalPanelStyle: CSSProperties = {
   maxWidth: 720,
   overflowY: 'auto',
   width: 'min(720px, 100%)',
+};
+
+const getQuestionPreview = (question: QuestionRow) => {
+  const text = getQuestionText(question).trim();
+  return text.length > 90 ? `${text.slice(0, 90)}...` : text;
+};
+
+const questionContentStyle: CSSProperties = {
+  color: '#172033',
+  display: '-webkit-box',
+  fontSize: 15,
+  fontWeight: 800,
+  lineHeight: 1.45,
+  marginBottom: 6,
+  overflow: 'hidden',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: 2,
+  whiteSpace: 'normal',
 };
 
 export function WorkbookPage() {
@@ -179,7 +189,7 @@ export function WorkbookPage() {
     return questions.filter((question) => {
       const matchesKeyword =
         !normalizedKeyword ||
-        [getQuestionText(question), question.subject, question.category ?? '', question.explanation ?? '']
+        [getQuestionText(question), question.subject, question.category ?? '', question.difficulty, question.status]
           .join(' ')
           .toLowerCase()
           .includes(normalizedKeyword);
@@ -414,7 +424,7 @@ export function WorkbookPage() {
               <input
                 value={questionKeyword}
                 onChange={(event) => setQuestionKeyword(event.target.value)}
-                placeholder="문제, 과목, 카테고리 검색"
+                placeholder="문제 내용, 과목, 카테고리, 난이도, 상태 검색"
               />
             </label>
             <label className="search-field">
@@ -477,12 +487,10 @@ export function WorkbookPage() {
                   onDragStart={(event) => handleDragStart(event, question.id)}
                 >
                   <div>
+                    <div style={questionContentStyle}>{getQuestionPreview(question)}</div>
                     <span className="question-meta">
-                      {getQuestionTypeLabel(question.type)} · {question.subject} ·{' '}
-                      {question.category ?? '미분류'} · {difficultyLabels[question.difficulty]}
+                      {question.subject} | {question.category ?? '미분류'} | {difficultyLabels[question.difficulty]}
                     </span>
-                    <strong>{getQuestionText(question)}</strong>
-                    <p>{question.explanation}</p>
                   </div>
                   <button
                     className="text-button"
@@ -541,11 +549,11 @@ export function WorkbookPage() {
                   <article className="workbook-question" key={item.id}>
                     <div className="sequence-badge">{index + 1}</div>
                     <div className="workbook-question-body">
+                      <div style={questionContentStyle}>{getQuestionPreview(question)}</div>
                       <span className="question-meta">
                         {question.subject} · {question.category ?? '미분류'} ·{' '}
                         {difficultyLabels[question.difficulty]}
                       </span>
-                      <strong>{getQuestionText(question)}</strong>
                       <p>{item.score}점 · 정답 보기 {question.correctAnswerIndex + 1}</p>
                     </div>
                     <div className="workbook-actions">

@@ -50,12 +50,23 @@ export function QuestionForm({ initialValues, mode, onCancel, onSubmit }: Questi
     event.preventDefault();
     onSubmit({
       ...values,
+      content: values.content.trim(),
       choices: values.choices.map((choice) => choice.trim()),
     });
   };
 
   return (
     <form className="cohort-form" onSubmit={handleSubmit}>
+      <label>
+        <span>문제 내용</span>
+        <textarea
+          required
+          value={values.content}
+          onChange={(event) => setValues((current) => ({ ...current, content: event.target.value }))}
+          placeholder="학생에게 보여질 실제 문제 내용을 입력하세요."
+        />
+      </label>
+
       <div className="form-grid">
         <label>
           <span>과목</span>
@@ -85,28 +96,7 @@ export function QuestionForm({ initialValues, mode, onCancel, onSubmit }: Questi
             <option value="hard">어려움</option>
           </select>
         </label>
-        <label>
-          <span>상태</span>
-          <select
-            value={values.status}
-            onChange={(event) => setValues((current) => ({ ...current, status: event.target.value as ContentStatus }))}
-          >
-            <option value="draft">초안</option>
-            <option value="published">게시</option>
-            <option value="archived">보관</option>
-          </select>
-        </label>
       </div>
-
-      <label>
-        <span>문제 내용</span>
-        <textarea
-          required
-          value={values.content}
-          onChange={(event) => setValues((current) => ({ ...current, content: event.target.value }))}
-          placeholder="객관식 문제 내용을 입력하세요."
-        />
-      </label>
 
       <div className="form-grid">
         {values.choices.map((choice, index) => (
@@ -146,6 +136,18 @@ export function QuestionForm({ initialValues, mode, onCancel, onSubmit }: Questi
           onChange={(event) => setValues((current) => ({ ...current, explanation: event.target.value }))}
           placeholder="정답 해설을 입력하세요."
         />
+      </label>
+
+      <label>
+        <span>상태</span>
+        <select
+          value={values.status}
+          onChange={(event) => setValues((current) => ({ ...current, status: event.target.value as ContentStatus }))}
+        >
+          <option value="draft">초안</option>
+          <option value="published">게시</option>
+          <option value="archived">보관</option>
+        </select>
       </label>
 
       <div className="form-actions">

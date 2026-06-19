@@ -1,3 +1,4 @@
+import { CSSProperties } from 'react';
 import { ContentStatus, Difficulty, QuestionType } from '../../types/domain';
 
 export type QuestionRow = {
@@ -41,6 +42,14 @@ const formatDate = (value: string) =>
     day: '2-digit',
   }).format(new Date(value));
 
+const contentPreviewStyle: CSSProperties = {
+  display: '-webkit-box',
+  overflow: 'hidden',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: 2,
+  whiteSpace: 'normal',
+};
+
 export function QuestionTable({ questions, onDelete, onEdit }: QuestionTableProps) {
   return (
     <div className="table-wrap">
@@ -62,9 +71,12 @@ export function QuestionTable({ questions, onDelete, onEdit }: QuestionTableProp
           {questions.map((question) => (
             <tr key={question.id}>
               <td>
-                <div className="table-title">{question.content}</div>
+                <div className="table-title" style={contentPreviewStyle}>
+                  {question.content}
+                </div>
                 <span className="table-subtitle">
-                  객관식 · 보기 {question.choices.length}개 · {question.explanation || '해설 없음'}
+                  {question.subject} │ {question.category || '미분류'} │ {difficultyLabels[question.difficulty]} │{' '}
+                  {statusLabels[question.status]}
                 </span>
               </td>
               <td>{question.subject}</td>
