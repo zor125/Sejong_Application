@@ -65,7 +65,7 @@ export function QuestionPage() {
     return questions.filter((question) => {
       const matchesKeyword =
         !normalizedKeyword ||
-        [question.content, question.subject, question.category ?? '', question.explanation ?? ''].some((value) =>
+        [question.content, question.subject, question.category ?? '', question.difficulty, question.status].some((value) =>
           value.toLowerCase().includes(normalizedKeyword),
         );
       const matchesSubject = subject === 'all' || question.subject === subject;
@@ -178,7 +178,7 @@ export function QuestionPage() {
             <input
               value={keyword}
               onChange={(event) => handleFilterChange(() => setKeyword(event.target.value))}
-              placeholder="문제, 과목, 카테고리, 해설 검색"
+              placeholder="문제 내용, 과목, 카테고리, 난이도, 상태 검색"
             />
           </label>
           <label className="search-field">
