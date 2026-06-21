@@ -2,17 +2,17 @@ BEGIN;
 
 INSERT INTO users (id, login_id, name, email, password_hash, role, status, created_at, updated_at)
 VALUES
-  ('00000000-0000-0000-0001-000000000001', 'admin', '관리자', 'admin@sejong.test', '$seed$admin-1234', 'admin', 'active', '2026-01-01T00:00:00Z', '2026-06-01T00:00:00Z'),
-  ('00000000-0000-0000-0001-000000000002', 'teacher1', '한수진', 'sujin.han@sejong.test', '$seed$teacher-1234', 'teacher', 'active', '2026-01-05T00:00:00Z', '2026-06-01T00:00:00Z'),
-  ('00000000-0000-0000-0001-000000000003', 'teacher2', '이도윤', 'doyoon.lee@sejong.test', '$seed$teacher-1234', 'teacher', 'active', '2026-01-05T00:10:00Z', '2026-06-01T00:00:00Z'),
-  ('00000000-0000-0000-0001-000000000101', 'student1', '김민지', 'minji.kim@student.test', '$seed$student-1234', 'student', 'active', '2026-03-02T01:00:00Z', '2026-06-15T02:00:00Z'),
-  ('00000000-0000-0000-0001-000000000102', 'student2', '박서연', 'seoyeon.park@student.test', '$seed$student-1234', 'student', 'active', '2026-03-02T01:10:00Z', '2026-06-16T00:20:00Z'),
-  ('00000000-0000-0000-0001-000000000103', 'student3', '오지훈', 'jihoon.oh@student.test', '$seed$student-1234', 'student', 'active', '2026-03-02T01:20:00Z', '2026-06-17T23:44:00Z'),
-  ('00000000-0000-0000-0001-000000000104', 'student4', '최유진', 'yujin.choi@student.test', '$seed$student-1234', 'student', 'active', '2026-05-20T04:00:00Z', '2026-06-16T11:21:00Z'),
-  ('00000000-0000-0000-0001-000000000105', 'student5', '정다은', 'daeun.jung@student.test', '$seed$student-1234', 'student', 'active', '2026-05-20T04:10:00Z', '2026-06-18T02:40:00Z'),
-  ('00000000-0000-0000-0001-000000000106', 'student6', '문태영', 'taeyoung.moon@student.test', '$seed$student-1234', 'student', 'inactive', '2026-05-20T04:20:00Z', '2026-05-20T04:20:00Z'),
-  ('00000000-0000-0000-0001-000000000107', 'student7', '한지우', 'jiwoo.han@student.test', '$seed$student-1234', 'student', 'active', '2025-09-01T00:00:00Z', '2026-02-27T09:00:00Z'),
-  ('00000000-0000-0000-0001-000000000108', 'student8', '송예린', 'yerin.song@student.test', '$seed$student-1234', 'student', 'active', '2025-09-01T00:10:00Z', '2026-02-27T09:10:00Z')
+  ('00000000-0000-0000-0001-000000000001', 'admin', '관리자', 'admin@sejong.test', '$2b$10$PvYtH4GT2rE7hACdSG1oJufdaX5uWtjn.S/a52pPKorDnTnt9BQMm', 'admin', 'active', '2026-01-01T00:00:00Z', '2026-06-01T00:00:00Z'),
+  ('00000000-0000-0000-0001-000000000002', 'teacher1', '한수진', 'sujin.han@sejong.test', '$2b$10$rFM.igvRzeAHTdyQVlDRAO7rP0GZcaMMXRVRE9xZ1GmBiqfxuytxq', 'teacher', 'active', '2026-01-05T00:00:00Z', '2026-06-01T00:00:00Z'),
+  ('00000000-0000-0000-0001-000000000003', 'teacher2', '이도윤', 'doyoon.lee@sejong.test', '$2b$10$rFM.igvRzeAHTdyQVlDRAO7rP0GZcaMMXRVRE9xZ1GmBiqfxuytxq', 'teacher', 'active', '2026-01-05T00:10:00Z', '2026-06-01T00:00:00Z'),
+  ('00000000-0000-0000-0001-000000000101', 'student1', '김민지', 'minji.kim@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'active', '2026-03-02T01:00:00Z', '2026-06-15T02:00:00Z'),
+  ('00000000-0000-0000-0001-000000000102', 'student2', '박서연', 'seoyeon.park@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'active', '2026-03-02T01:10:00Z', '2026-06-16T00:20:00Z'),
+  ('00000000-0000-0000-0001-000000000103', 'student3', '오지훈', 'jihoon.oh@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'active', '2026-03-02T01:20:00Z', '2026-06-17T23:44:00Z'),
+  ('00000000-0000-0000-0001-000000000104', 'student4', '최유진', 'yujin.choi@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'active', '2026-05-20T04:00:00Z', '2026-06-16T11:21:00Z'),
+  ('00000000-0000-0000-0001-000000000105', 'student5', '정다은', 'daeun.jung@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'active', '2026-05-20T04:10:00Z', '2026-06-18T02:40:00Z'),
+  ('00000000-0000-0000-0001-000000000106', 'student6', '문태영', 'taeyoung.moon@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'inactive', '2026-05-20T04:20:00Z', '2026-05-20T04:20:00Z'),
+  ('00000000-0000-0000-0001-000000000107', 'student7', '한지우', 'jiwoo.han@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'active', '2025-09-01T00:00:00Z', '2026-02-27T09:00:00Z'),
+  ('00000000-0000-0000-0001-000000000108', 'student8', '송예린', 'yerin.song@student.test', '$2b$10$fNgZPAq9wZvw5OH.mjWfcOJVSyK75gB5EWrlkKIQsXW3hKngtwn7W', 'student', 'active', '2025-09-01T00:10:00Z', '2026-02-27T09:10:00Z')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO security_questions (id, user_id, purpose, question, answer_hash, is_active, created_at, updated_at)
