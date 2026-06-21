@@ -8,6 +8,7 @@ import { WorkbooksModule } from './admin/workbooks/workbooks.module';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { ScoresModule } from './scores/scores.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { SubmissionsModule } from './submissions/submissions.module';
     WorkbookAssignmentsModule,
     WorkbooksModule,
     SubmissionsModule,
+    ScoresModule,
     HealthModule,
   ],
 })
