@@ -56,15 +56,14 @@ cp .env.example .env
 
 필수 환경 변수:
 
-| 이름 | 설명 |
-| --- | --- |
-| `NODE_ENV` | 실행 환경 |
-| `PORT` | API 서버 포트 |
-| `DATABASE_URL` | PostgreSQL 또는 Supabase PostgreSQL 연결 문자열 |
-| `SUPABASE_URL` | Supabase 프로젝트 URL |
-| `SUPABASE_ANON_KEY` | Supabase 클라이언트용 anon key |
-| `JWT_SECRET` | JWT 서명용 secret |
-| `JWT_ACCESS_TOKEN_TTL_SECONDS` | access token 유효시간(초, 기본값 `3600`) |
+| 이름 | 필수 여부 | 설명 |
+| --- | --- | --- |
+| `NODE_ENV` | 운영 환경 필수 | 실행 환경. Railway에서는 `production` 사용 |
+| `PORT` | 선택 | API 서버 포트. 기본값 `3000`, Railway가 자동 제공 |
+| `DATABASE_URL` | 필수 | PostgreSQL 또는 Supabase PostgreSQL 연결 문자열 |
+| `JWT_SECRET` | 필수 | JWT 서명용 긴 임의 문자열 |
+| `JWT_ACCESS_TOKEN_TTL_SECONDS` | 선택 | access token 유효시간(초, 기본값 `3600`) |
+| `CORS_ORIGIN` | 운영 브라우저 클라이언트 필수 | 쉼표로 구분한 허용 Origin 목록 |
 
 ## PostgreSQL 연결
 
@@ -78,11 +77,21 @@ Supabase PostgreSQL 예시:
 
 ```env
 DATABASE_URL=postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres
-SUPABASE_URL=https://[PROJECT_REF].supabase.co
-SUPABASE_ANON_KEY=[ANON_KEY]
 ```
 
 `DatabaseModule`은 `DATABASE_URL`을 읽어 `pg.Pool`을 생성한다. 연결 문자열에 `supabase.co`가 포함되면 SSL 옵션을 켠다.
+현재 Backend는 PostgreSQL에 직접 연결하므로 Supabase 클라이언트용 URL과 anon key는 사용하지 않는다.
+
+실제 `DATABASE_URL`과 `JWT_SECRET`은 로컬 `.env` 또는 배포 플랫폼의 Secret 저장소에만 보관한다.
+프론트엔드 번들, GitHub, 문서에는 실제 값을 넣지 않는다.
+
+## 서버 바인딩과 CORS
+
+서버는 `PORT`를 읽고 `0.0.0.0`에서 요청을 받는다. 따라서 로컬 개발과 Railway의 동적 포트 환경을 모두 지원한다.
+
+`CORS_ORIGIN`에는 브라우저에서 접근할 정확한 Origin을 쉼표로 구분해 입력한다. 개발 환경에서는 Admin Web과 Expo Web 테스트를 위해 `localhost` 및 `127.0.0.1`의 `5173`, `8081`, `19006` 포트가 추가로 허용된다.
+
+운영 환경에서는 `CORS_ORIGIN`에 명시된 Origin만 허용한다. 변수를 설정하지 않으면 브라우저의 교차 출처 요청은 허용되지 않지만, `curl`, 서버 간 통신, Railway Health Check처럼 `Origin` 헤더가 없는 요청은 계속 처리한다. 와일드카드 `*`는 서버 시작 단계에서 거부한다. 인증에 필요한 `Authorization`과 `Content-Type` 헤더는 허용한다.
 
 ## 실행 방법
 
@@ -119,6 +128,13 @@ http://localhost:3000
   "timestamp": "2026-06-21T00:00:00.000Z"
 }
 ```
+
+응답에는 DB URL, JWT Secret 또는 내부 환경 설정이 포함되지 않는다.
+
+## Railway 배포
+
+GitHub 저장소 연결, Railway 서비스 설정, 운영 환경 변수, Supabase 연결 주의사항,
+공개 도메인 생성 및 배포 후 Health Check 절차는 [DEPLOYMENT.md](./DEPLOYMENT.md)를 참고한다.
 
 ## Auth API
 
