@@ -21,8 +21,8 @@ const getLoginErrorMessage = (error: unknown) => {
 
 export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
   const { expiredMessage, isAuthenticated, login, user } = useAuth();
-  const [id, setId] = useState('student1');
-  const [password, setPassword] = useState('student-1234');
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(expiredMessage);
   const [isLoading, setIsLoading] = useState(false);
 
