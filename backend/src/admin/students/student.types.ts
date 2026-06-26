@@ -1,4 +1,4 @@
-export type StudentStatus = 'active' | 'inactive' | 'paused' | 'graduated';
+export type StudentStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 
 export type StudentRow = {
   id: string;
@@ -7,12 +7,16 @@ export type StudentRow = {
   login_id: string;
   email: string | null;
   phone: string | null;
-  cohort_id: string;
-  cohort_name: string;
+  cohort_id: string | null;
+  cohort_name: string | null;
+  auth_provider: string;
+  provider_user_id: string | null;
   student_no: string | null;
   status: StudentStatus;
-  enrolled_on: string | Date;
+  enrolled_on: string | Date | null;
   completed_on: string | Date | null;
+  approved_at: Date | null;
+  approved_by_teacher_id: string | null;
   memo: string | null;
   created_at: Date;
   updated_at: Date;
@@ -26,14 +30,18 @@ export type StudentResponse = {
   email: string | null;
   phone: string | null;
   cohort: {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
   };
-  cohortId: string;
+  cohortId: string | null;
+  authProvider: string;
+  providerUserId: string | null;
   studentNo: string | null;
   status: StudentStatus;
-  enrolledOn: string;
+  enrolledOn: string | null;
   completedOn: string | null;
+  approvedAt: string | null;
+  approvedByTeacherId: string | null;
   memo?: string | null;
   createdAt: string;
   updatedAt: string;

@@ -1,6 +1,7 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { KakaoAuthorizeQueryDto, KakaoCallbackDto } from './dto/kakao-login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,9 +13,15 @@ export class AuthController {
     return this.authService.loginTeacher(credentials);
   }
 
-  @Post('student/login')
+  @Get('student/kakao/authorize')
   @HttpCode(HttpStatus.OK)
-  loginStudent(@Body() credentials: LoginDto) {
-    return this.authService.loginStudent(credentials);
+  getKakaoAuthorizeUrl(@Query() query: KakaoAuthorizeQueryDto) {
+    return this.authService.getKakaoAuthorizeUrl(query.redirectUri, query.state);
+  }
+
+  @Post('student/kakao/callback')
+  @HttpCode(HttpStatus.OK)
+  loginStudentWithKakao(@Body() body: KakaoCallbackDto) {
+    return this.authService.loginStudentWithKakao(body.code, body.redirectUri, body.state);
   }
 }

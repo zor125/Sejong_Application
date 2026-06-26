@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { CohortSelectScreen } from '../screens/CohortSelectScreen';
 import { LoginScreen } from '../screens/LoginScreen';
+import { ApprovalStatusScreen } from '../screens/ApprovalStatusScreen';
 import { MainScreen } from '../screens/MainScreen';
 import { ResultScreen } from '../screens/ResultScreen';
 import { WorkbookDetailScreen } from '../screens/WorkbookDetailScreen';
@@ -47,6 +48,11 @@ export function AppNavigator() {
                 })}
               >
                 <Stack.Screen name="Login" component={LoginScreen} options={{ title: '로그인' }} />
+                <Stack.Screen
+                  name="ApprovalStatus"
+                  component={ApprovalStatusScreen}
+                  options={{ title: '가입 승인 상태', headerBackVisible: false }}
+                />
                 <Stack.Screen
                   name="CohortSelect"
                   component={CohortSelectScreen}

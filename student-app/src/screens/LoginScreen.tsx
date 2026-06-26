@@ -1,47 +1,216 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
-import { ApiConfigurationError, ApiError, ApiNetworkError } from '../api/client';
+import { ApiConfigurationError, ApiNetworkError } from '../api/client';
 import { useAuth } from '../state/AuthContext';
 import type { ScreenProps } from '../types/navigation';
+
+const KAKAO_CALLBACK_SCHEME = 'nursing-student-app://kakao/oauth';
+const KAKAO_OAUTH_STATE_STORAGE_KEY = 'sejong_kakao_oauth_state';
+let nativeOAuthState: string | null = null;
+
+const getWebLocation = () => {
+  if (typeof globalThis === 'undefined' || !('location' in globalThis)) return null;
+  return (globalThis as typeof globalThis & { location: Location }).location;
+};
+
+const getSessionStorage = () => {
+  if (typeof globalThis === 'undefined' || !('sessionStorage' in globalThis)) return null;
+  return (globalThis as typeof globalThis & { sessionStorage: Storage }).sessionStorage;
+};
+
+const generateOAuthState = () => {
+  const bytes = new Uint8Array(32);
+  const cryptoObject = (globalThis as typeof globalThis & { crypto?: Crypto }).crypto;
+
+  if (!cryptoObject?.getRandomValues) {
+    throw new Error('보안 로그인을 위한 난수 생성 기능을 사용할 수 없습니다.');
+  }
+
+  cryptoObject.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+};
+
+const saveOAuthState = (state: string) => {
+  const sessionStorage = getSessionStorage();
+
+  if (Platform.OS === 'web' && sessionStorage) {
+    sessionStorage.setItem(KAKAO_OAUTH_STATE_STORAGE_KEY, state);
+    return;
+  }
+
+  nativeOAuthState = state;
+};
+
+const getStoredOAuthState = () => {
+  const sessionStorage = getSessionStorage();
+
+  if (Platform.OS === 'web' && sessionStorage) {
+    return sessionStorage.getItem(KAKAO_OAUTH_STATE_STORAGE_KEY);
+  }
+
+  return nativeOAuthState;
+};
+
+const clearOAuthState = () => {
+  getSessionStorage()?.removeItem(KAKAO_OAUTH_STATE_STORAGE_KEY);
+  nativeOAuthState = null;
+};
+
+const getRedirectUri = () => {
+  const configured = process.env.EXPO_PUBLIC_KAKAO_REDIRECT_URI?.trim();
+  if (configured) return configured;
+
+  const webLocation = getWebLocation();
+  if (Platform.OS === 'web' && webLocation?.origin) {
+    return webLocation.origin;
+  }
+
+  return KAKAO_CALLBACK_SCHEME;
+};
+
+const extractCodeFromUrl = (url: string) => {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.searchParams.get('code');
+  } catch {
+    return null;
+  }
+};
+
+const extractStateFromUrl = (url: string) => {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.searchParams.get('state');
+  } catch {
+    return null;
+  }
+};
+
+const clearWebKakaoQuery = () => {
+  if (Platform.OS !== 'web') return;
+  const history = (globalThis as typeof globalThis & { history?: History }).history;
+  const location = getWebLocation();
+
+  if (history && location?.origin) {
+    history.replaceState({}, '', location.origin);
+  }
+};
 
 const getLoginErrorMessage = (error: unknown) => {
   if (error instanceof ApiNetworkError || error instanceof ApiConfigurationError) {
     return error.message;
   }
 
-  if (error instanceof ApiError && error.status === 401) {
-    return '아이디 또는 비밀번호가 올바르지 않습니다.';
+  if (error instanceof Error) {
+    return error.message;
   }
 
-  return '로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+  return '카카오 로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
 };
 
 export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
-  const { expiredMessage, isAuthenticated, login, user } = useAuth();
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
+  const { approval, completeKakaoLogin, expiredMessage, getKakaoLoginUrl, isAuthenticated, user } = useAuth();
   const [errorMessage, setErrorMessage] = useState(expiredMessage);
   const [isLoading, setIsLoading] = useState(false);
+  const redirectUri = useMemo(getRedirectUri, []);
 
-  useEffect(() => {
-    if (isAuthenticated && user?.cohortId) {
-      navigation.replace('CohortSelect');
-    }
-  }, [isAuthenticated, navigation, user?.cohortId]);
+  const handleKakaoCallbackUrl = useCallback(async (url: string) => {
+    const code = extractCodeFromUrl(url);
+    const callbackState = extractStateFromUrl(url);
+    if (!code || isLoading) return;
 
-  const handleLogin = async () => {
     setIsLoading(true);
     setErrorMessage('');
 
     try {
-      await login(id, password);
-      navigation.replace('CohortSelect');
+      const storedState = getStoredOAuthState();
+
+      if (!callbackState) {
+        throw new Error('카카오 로그인 state 값이 없어 로그인을 완료할 수 없습니다. 다시 시도해주세요.');
+      }
+
+      if (!storedState) {
+        throw new Error('만료된 카카오 로그인 요청입니다. 다시 로그인해주세요.');
+      }
+
+      if (callbackState !== storedState) {
+        throw new Error('카카오 로그인 요청이 일치하지 않습니다. 다시 로그인해주세요.');
+      }
+
+      const result = await completeKakaoLogin(code, redirectUri, callbackState);
+      clearWebKakaoQuery();
+      clearOAuthState();
+
+      if ('role' in result) {
+        navigation.replace('CohortSelect');
+      } else {
+        navigation.replace('ApprovalStatus');
+      }
     } catch (error) {
+      clearOAuthState();
+      clearWebKakaoQuery();
       setErrorMessage(getLoginErrorMessage(error));
     } finally {
+      setIsLoading(false);
+    }
+  }, [completeKakaoLogin, isLoading, navigation, redirectUri]);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.cohortId) {
+      navigation.replace('CohortSelect');
+      return;
+    }
+
+    if (approval) {
+      navigation.replace('ApprovalStatus');
+    }
+  }, [approval, isAuthenticated, navigation, user?.cohortId]);
+
+  useEffect(() => {
+    const webLocation = getWebLocation();
+
+    if (Platform.OS === 'web' && webLocation?.href) {
+      void handleKakaoCallbackUrl(webLocation.href);
+    }
+
+    const subscription = Linking.addEventListener('url', (event) => {
+      void handleKakaoCallbackUrl(event.url);
+    });
+
+    Linking.getInitialURL().then((url) => {
+      if (url) void handleKakaoCallbackUrl(url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [handleKakaoCallbackUrl]);
+
+  const handleKakaoLogin = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      const state = generateOAuthState();
+      saveOAuthState(state);
+
+      const authorizationUrl = await getKakaoLoginUrl(redirectUri, state);
+
+      if (Platform.OS === 'web') {
+        const webLocation = getWebLocation();
+        if (webLocation) {
+          webLocation.href = authorizationUrl;
+          return;
+        }
+      }
+
+      await Linking.openURL(authorizationUrl);
+    } catch (error) {
+      clearOAuthState();
+      setErrorMessage(getLoginErrorMessage(error));
       setIsLoading(false);
     }
   };
@@ -56,30 +225,17 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
         <View style={styles.header}>
           <Text style={styles.kicker}>NURSING ACADEMY</Text>
           <Text style={styles.title}>간호문제</Text>
-          <Text style={styles.description}>배포된 문제집을 확인하고 오답을 정리하세요.</Text>
+          <Text style={styles.description}>카카오 로그인 후 강사 승인이 완료되면 문제집을 풀이할 수 있습니다.</Text>
         </View>
 
         <View style={styles.form}>
-          <Text style={styles.label}>아이디</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="아이디"
-            value={id}
-            onChangeText={setId}
-            autoCapitalize="none"
-          />
-          <Text style={styles.label}>비밀번호</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="비밀번호"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
           {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-          <PrimaryButton disabled={isLoading} onPress={handleLogin}>
-            {isLoading ? '로그인 중...' : '로그인'}
+          <PrimaryButton disabled={isLoading} onPress={handleKakaoLogin}>
+            {isLoading ? '카카오 로그인 중...' : '카카오로 로그인'}
           </PrimaryButton>
+          <Text style={styles.helperText}>
+            처음 로그인한 학생은 승인대기 상태로 등록됩니다.
+          </Text>
         </View>
       </View>
     </Screen>
@@ -100,10 +256,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 26,
     borderRadius: 22,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#FEE500',
   },
   logoText: {
-    color: '#1D4ED8',
+    color: '#171717',
     fontSize: 24,
     fontWeight: '900',
   },
@@ -126,28 +282,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: '#6B7280',
     fontSize: 14,
+    lineHeight: 20,
   },
   form: {
-    gap: 10,
-  },
-  label: {
-    color: '#334155',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  input: {
-    height: 52,
-    marginBottom: 6,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 16,
-    backgroundColor: '#F8FAFC',
+    gap: 12,
   },
   errorText: {
     marginBottom: 8,
     color: '#DC2626',
     fontSize: 13,
     fontWeight: '800',
+  },
+  helperText: {
+    color: '#64748B',
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
   },
 });
