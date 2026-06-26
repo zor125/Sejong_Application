@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { StudentStatus } from '../student.types';
 
-const STUDENT_STATUSES: StudentStatus[] = ['active', 'inactive', 'paused', 'graduated'];
+const STUDENT_STATUSES: StudentStatus[] = ['pending', 'approved', 'rejected', 'suspended'];
 
 export class CreateStudentDto {
   @IsString()
@@ -35,8 +35,9 @@ export class CreateStudentDto {
   @MaxLength(30)
   phone?: string | null;
 
+  @IsOptional()
   @IsUUID()
-  cohortId!: string;
+  cohortId?: string | null;
 
   @IsOptional()
   @IsString()
@@ -47,8 +48,9 @@ export class CreateStudentDto {
   @IsIn(STUDENT_STATUSES)
   status?: StudentStatus;
 
+  @IsOptional()
   @IsISO8601({ strict: true })
-  enrolledOn!: string;
+  enrolledOn?: string | null;
 
   @IsOptional()
   @IsISO8601({ strict: true })

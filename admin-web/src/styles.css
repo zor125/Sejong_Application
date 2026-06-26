@@ -281,6 +281,22 @@ th {
   color: #1d4ed8;
 }
 
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-rejected,
+.status-suspended {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .status-cancelled {
   background: #fee2e2;
   color: #991b1b;
@@ -757,4 +773,14 @@ th {
   .workbook-actions {
     flex-wrap: wrap;
   }
+}
+.inline-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-action-group select {
+  min-width: 140px;
 }

@@ -90,3 +90,21 @@ may also be configured to use `/api/health` as its service health-check path.
 - The actual `.env`, database URL, database password, and JWT secret are not committed.
 - `/api/health` returns `200` from the generated HTTPS domain.
 - Browser frontends are listed explicitly in `CORS_ORIGIN`; wildcard CORS is not used.
+
+## 6. Kakao student login settings
+
+Add these values directly in Railway Variables. Do not commit real Kakao keys.
+
+- `KAKAO_REST_API_KEY`: Kakao Developers REST API key.
+- `KAKAO_CLIENT_SECRET`: optional Kakao client secret if enabled in Kakao Developers.
+
+Register redirect URIs in Kakao Developers for each runtime:
+
+- Student App Web / Vercel: `https://YOUR_STUDENT_APP_DOMAIN`
+- Local Expo Web: `http://localhost:8081`
+- Local Vite Web if used: `http://localhost:5173`
+- Native app deep link: `nursing-student-app://kakao/oauth`
+
+Set this Student App environment variable only when a fixed redirect URI is needed:
+
+- `EXPO_PUBLIC_KAKAO_REDIRECT_URI`

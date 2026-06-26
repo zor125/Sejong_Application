@@ -10,11 +10,13 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AuthenticatedRequest, JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { ApproveStudentDto } from './dto/approve-student.dto';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { ListStudentsDto } from './dto/list-students.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -47,6 +49,25 @@ export class StudentsController {
     @Body() body: UpdateStudentDto,
   ) {
     return this.studentsService.updateStudent(studentId, body);
+  }
+
+  @Patch(':studentId/approve')
+  approveStudent(
+    @Param('studentId', ParseUUIDPipe) studentId: string,
+    @Body() body: ApproveStudentDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.studentsService.approveStudent(studentId, body, request.user?.sub);
+  }
+
+  @Patch(':studentId/reject')
+  rejectStudent(@Param('studentId', ParseUUIDPipe) studentId: string) {
+    return this.studentsService.rejectStudent(studentId);
+  }
+
+  @Patch(':studentId/suspend')
+  suspendStudent(@Param('studentId', ParseUUIDPipe) studentId: string) {
+    return this.studentsService.suspendStudent(studentId);
   }
 
   @Delete(':studentId')

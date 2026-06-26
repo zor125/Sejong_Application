@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TYPE user_role AS ENUM ('admin', 'teacher', 'student');
 CREATE TYPE user_status AS ENUM ('active', 'inactive');
 CREATE TYPE cohort_status AS ENUM ('planned', 'active', 'completed');
-CREATE TYPE student_status AS ENUM ('active', 'inactive', 'paused', 'graduated');
+CREATE TYPE student_status AS ENUM ('pending', 'approved', 'rejected', 'suspended');
 CREATE TYPE question_difficulty AS ENUM ('easy', 'medium', 'hard');
 CREATE TYPE question_type AS ENUM ('multiple_choice');
 CREATE TYPE content_status AS ENUM ('draft', 'published', 'archived');
@@ -27,6 +27,8 @@ CREATE TABLE users (
   email VARCHAR(255),
   password_hash TEXT NOT NULL,
   role user_role NOT NULL,
+  auth_provider VARCHAR(30) NOT NULL DEFAULT 'password',
+  provider_user_id VARCHAR(120),
   status user_status NOT NULL DEFAULT 'active',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -35,8 +37,12 @@ CREATE TABLE users (
 
 CREATE UNIQUE INDEX uq_users_login_id_active ON users (login_id) WHERE deleted_at IS NULL;
 CREATE UNIQUE INDEX uq_users_email_active ON users (email) WHERE email IS NOT NULL AND deleted_at IS NULL;
+CREATE UNIQUE INDEX uq_users_auth_provider_user_active
+  ON users (auth_provider, provider_user_id)
+  WHERE provider_user_id IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_users_role ON users (role);
 CREATE INDEX idx_users_status ON users (status);
+CREATE INDEX idx_users_auth_provider ON users (auth_provider);
 
 CREATE TABLE refresh_tokens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -119,13 +125,15 @@ CREATE INDEX idx_cohorts_starts_on ON cohorts (starts_on);
 CREATE TABLE students (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id),
-  cohort_id UUID NOT NULL REFERENCES cohorts(id),
+  cohort_id UUID REFERENCES cohorts(id),
   phone VARCHAR(30),
   birth_date DATE,
   student_no VARCHAR(50),
-  status student_status NOT NULL DEFAULT 'active',
-  enrolled_on DATE NOT NULL,
+  status student_status NOT NULL DEFAULT 'pending',
+  enrolled_on DATE,
   completed_on DATE,
+  approved_at TIMESTAMPTZ,
+  approved_by_teacher_id UUID REFERENCES teachers(id),
   memo TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -136,6 +144,7 @@ CREATE UNIQUE INDEX uq_students_user_id_active ON students (user_id) WHERE delet
 CREATE UNIQUE INDEX uq_students_student_no_active ON students (student_no) WHERE student_no IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_students_cohort_id ON students (cohort_id);
 CREATE INDEX idx_students_status ON students (status);
+CREATE INDEX idx_students_approved_by_teacher_id ON students (approved_by_teacher_id);
 
 CREATE TABLE questions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

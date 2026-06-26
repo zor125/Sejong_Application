@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 import { StudentStatus } from '../student.types';
 
-const STUDENT_STATUSES: StudentStatus[] = ['active', 'inactive', 'paused', 'graduated'];
+const STUDENT_STATUSES: StudentStatus[] = ['pending', 'approved', 'rejected', 'suspended'];
 
 export class ListStudentsDto {
   @IsOptional()

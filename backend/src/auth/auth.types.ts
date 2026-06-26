@@ -17,3 +17,22 @@ export type AccessTokenPayload = {
   role: UserRole;
   profileId?: string;
 };
+
+export type StudentApprovalStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
+
+export type KakaoUserInfo = {
+  providerUserId: string;
+  nickname: string | null;
+  email: string | null;
+};
+
+export type KakaoStudentRow = {
+  user_id: string;
+  login_id: string;
+  name: string;
+  email: string | null;
+  user_status: 'active' | 'inactive';
+  student_id: string;
+  cohort_id: string | null;
+  student_status: StudentApprovalStatus;
+};

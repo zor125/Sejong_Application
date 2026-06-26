@@ -1,9 +1,21 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { DatabaseService } from '../database/database.service';
 import { LoginDto } from './dto/login.dto';
-import { AccessTokenPayload, LoginRole, LoginUserRow } from './auth.types';
+import {
+  AccessTokenPayload,
+  KakaoStudentRow,
+  KakaoUserInfo,
+  LoginRole,
+  LoginUserRow,
+  StudentApprovalStatus,
+} from './auth.types';
 
 const INVALID_CREDENTIALS_RESPONSE = {
   error: {
@@ -18,14 +30,11 @@ export class AuthService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   loginTeacher(credentials: LoginDto) {
     return this.login(credentials, 'teacher');
-  }
-
-  loginStudent(credentials: LoginDto) {
-    return this.login(credentials, 'student');
   }
 
   private async login(credentials: LoginDto, role: LoginRole) {
@@ -75,6 +84,255 @@ export class AuthService {
               },
       },
     };
+  }
+
+  getKakaoAuthorizeUrl(redirectUri: string) {
+    const clientId = this.getKakaoClientId();
+    const authorizationUrl = new URL('https://kauth.kakao.com/oauth/authorize');
+
+    authorizationUrl.searchParams.set('client_id', clientId);
+    authorizationUrl.searchParams.set('redirect_uri', redirectUri);
+    authorizationUrl.searchParams.set('response_type', 'code');
+
+    return {
+      data: {
+        authorizationUrl: authorizationUrl.toString(),
+      },
+    };
+  }
+
+  async loginStudentWithKakao(code: string, redirectUri: string) {
+    const kakaoAccessToken = await this.exchangeKakaoCode(code, redirectUri);
+    const kakaoUser = await this.getKakaoUserInfo(kakaoAccessToken);
+    const student = await this.findOrCreateKakaoStudent(kakaoUser);
+
+    if (student.user_status !== 'active') {
+      return this.toStudentStatusResponse('suspended', student);
+    }
+
+    if (student.student_status !== 'approved') {
+      return this.toStudentStatusResponse(student.student_status, student);
+    }
+
+    if (!student.cohort_id) {
+      return this.toStudentStatusResponse('pending', student);
+    }
+
+    const payload: AccessTokenPayload = {
+      sub: student.user_id,
+      role: 'student',
+      profileId: student.student_id,
+    };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      data: {
+        status: 'approved' as const,
+        accessToken,
+        user: {
+          id: student.user_id,
+          role: 'student' as const,
+          name: student.name,
+          loginId: student.login_id,
+          email: student.email,
+          studentId: student.student_id,
+          cohortId: student.cohort_id,
+        },
+      },
+    };
+  }
+
+  private async exchangeKakaoCode(code: string, redirectUri: string): Promise<string> {
+    const clientId = this.getKakaoClientId();
+    const clientSecret = this.configService.get<string>('KAKAO_CLIENT_SECRET');
+    const form = new URLSearchParams();
+
+    form.set('grant_type', 'authorization_code');
+    form.set('client_id', clientId);
+    form.set('redirect_uri', redirectUri);
+    form.set('code', code);
+
+    if (clientSecret) {
+      form.set('client_secret', clientSecret);
+    }
+
+    const response = await fetch('https://kauth.kakao.com/oauth/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+      },
+      body: form,
+    });
+    const body = await response.json().catch(() => null) as { access_token?: string } | null;
+
+    if (!response.ok || !body?.access_token) {
+      throw new UnauthorizedException({
+        error: {
+          code: 'KAKAO_TOKEN_EXCHANGE_FAILED',
+          message: '카카오 인증에 실패했습니다. 다시 로그인해주세요.',
+          details: [],
+        },
+      });
+    }
+
+    return body.access_token;
+  }
+
+  private async getKakaoUserInfo(accessToken: string): Promise<KakaoUserInfo> {
+    const response = await fetch('https://kapi.kakao.com/v2/user/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const body = await response.json().catch(() => null) as {
+      id?: number | string;
+      properties?: { nickname?: string };
+      kakao_account?: {
+        email?: string;
+        profile?: { nickname?: string };
+      };
+    } | null;
+
+    if (!response.ok || body?.id === undefined || body.id === null) {
+      throw new UnauthorizedException({
+        error: {
+          code: 'KAKAO_USER_INFO_FAILED',
+          message: '카카오 사용자 정보를 확인하지 못했습니다.',
+          details: [],
+        },
+      });
+    }
+
+    return {
+      providerUserId: String(body.id),
+      nickname: body.kakao_account?.profile?.nickname ?? body.properties?.nickname ?? null,
+      email: body.kakao_account?.email ?? null,
+    };
+  }
+
+  private async findOrCreateKakaoStudent(kakaoUser: KakaoUserInfo): Promise<KakaoStudentRow> {
+    const existing = await this.findKakaoStudent(kakaoUser.providerUserId);
+    if (existing) return existing;
+
+    const pool = this.databaseService.getPool();
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const name = kakaoUser.nickname?.trim() || '카카오 학생';
+      const loginId = `kakao:${kakaoUser.providerUserId}`;
+      const userResult = await client.query<{ id: string }>(
+        `INSERT INTO users (
+           login_id,
+           name,
+           email,
+           password_hash,
+           role,
+           auth_provider,
+           provider_user_id,
+           status
+         )
+         VALUES ($1, $2, $3, $4, 'student', 'kakao', $5, 'active')
+         RETURNING id`,
+        [
+          loginId,
+          name,
+          kakaoUser.email,
+          'kakao-oauth-disabled',
+          kakaoUser.providerUserId,
+        ],
+      );
+      const userId = userResult.rows[0].id;
+      const studentResult = await client.query<{ id: string }>(
+        `INSERT INTO students (
+           user_id,
+           cohort_id,
+           status,
+           enrolled_on
+         )
+         VALUES ($1, NULL, 'pending', NULL)
+         RETURNING id`,
+        [userId],
+      );
+
+      await client.query('COMMIT');
+
+      return {
+        user_id: userId,
+        login_id: loginId,
+        name,
+        email: kakaoUser.email,
+        user_status: 'active',
+        student_id: studentResult.rows[0].id,
+        cohort_id: null,
+        student_status: 'pending',
+      };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      const raceWinner = await this.findKakaoStudent(kakaoUser.providerUserId);
+      if (raceWinner) return raceWinner;
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  private async findKakaoStudent(providerUserId: string): Promise<KakaoStudentRow | null> {
+    const result = await this.databaseService.getPool().query<KakaoStudentRow>(
+      `SELECT
+         users.id AS user_id,
+         users.login_id,
+         users.name,
+         users.email,
+         users.status AS user_status,
+         students.id AS student_id,
+         students.cohort_id,
+         students.status AS student_status
+       FROM users
+       JOIN students
+         ON students.user_id = users.id
+        AND students.deleted_at IS NULL
+       WHERE users.role = 'student'
+         AND users.auth_provider = 'kakao'
+         AND users.provider_user_id = $1
+         AND users.deleted_at IS NULL
+       LIMIT 1`,
+      [providerUserId],
+    );
+
+    return result.rows[0] ?? null;
+  }
+
+  private toStudentStatusResponse(status: StudentApprovalStatus, student: KakaoStudentRow) {
+    return {
+      data: {
+        status,
+        student: {
+          id: student.student_id,
+          name: student.name,
+          email: student.email,
+          cohortId: student.cohort_id,
+          status,
+        },
+      },
+    };
+  }
+
+  private getKakaoClientId(): string {
+    const clientId = this.configService.get<string>('KAKAO_REST_API_KEY');
+
+    if (!clientId) {
+      throw new InternalServerErrorException({
+        error: {
+          code: 'KAKAO_CONFIG_MISSING',
+          message: '카카오 로그인 설정이 완료되지 않았습니다.',
+          details: [],
+        },
+      });
+    }
+
+    return clientId;
   }
 
   private async findUser(identifier: string, role: LoginRole): Promise<LoginUserRow | null> {

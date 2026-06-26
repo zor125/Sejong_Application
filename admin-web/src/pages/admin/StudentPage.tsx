@@ -7,7 +7,6 @@ import { StudentRow, StudentTable } from '../../components/admin/StudentTable';
 import { StudentStatus } from '../../types/domain';
 
 const PAGE_SIZE = 5;
-const DEFAULT_STUDENT_PASSWORD = 'student-1234';
 
 type CohortOption = {
   id: string;
@@ -27,7 +26,7 @@ const toRow = (student: StudentApiItem): StudentRow => ({
   studentNo: student.studentNo ?? '',
   status: student.status,
   enrolledAt: student.enrolledOn,
-  enrolledOn: student.enrolledOn,
+  enrolledOn: student.enrolledOn ?? '',
   createdAt: student.createdAt,
   updatedAt: student.updatedAt,
   deletedAt: null,
@@ -38,10 +37,10 @@ const toFormValues = (student: StudentRow): StudentFormValues => ({
   email: student.email,
   phone: student.phone ?? '',
   studentNo: student.studentNo,
-  cohortId: student.cohortId,
+  cohortId: student.cohortId ?? '',
   birthDate: student.birthDate ? student.birthDate.slice(0, 10) : '',
   status: student.status,
-  enrolledOn: student.enrolledOn,
+  enrolledOn: student.enrolledOn ?? '',
 });
 
 const toPayload = (values: StudentFormValues): UpdateStudentPayload => ({
@@ -49,11 +48,11 @@ const toPayload = (values: StudentFormValues): UpdateStudentPayload => ({
   loginId: values.studentNo,
   email: values.email || null,
   phone: values.phone || null,
-  cohortId: values.cohortId,
+  cohortId: values.cohortId || null,
   studentNo: values.studentNo,
   status: values.status,
   enrolledOn: values.enrolledOn,
-  completedOn: values.status === 'graduated' ? values.enrolledOn : null,
+  completedOn: null,
   memo: null,
 });
 
@@ -66,7 +65,7 @@ export function StudentPage() {
   const [page, setPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [editingStudent, setEditingStudent] = useState<StudentRow | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+  const [approvalCohortIds, setApprovalCohortIds] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -119,7 +118,6 @@ export function StudentPage() {
 
   const closeForm = () => {
     setEditingStudent(null);
-    setIsCreating(false);
   };
 
   const handleKeywordChange = (value: string) => {
@@ -144,25 +142,6 @@ export function StudentPage() {
     setPage(1);
   };
 
-  const handleCreate = async (values: StudentFormValues) => {
-    setIsSubmitting(true);
-    setErrorMessage('');
-
-    try {
-      await studentApi.create({
-        ...toPayload(values),
-        password: DEFAULT_STUDENT_PASSWORD,
-      });
-      closeForm();
-      setPage(1);
-      await loadStudents(1);
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : '학생을 생성하지 못했습니다.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleUpdate = async (values: StudentFormValues) => {
     if (!editingStudent) return;
 
@@ -175,6 +154,70 @@ export function StudentPage() {
       await loadStudents();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : '학생을 수정하지 못했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleApprovalCohortChange = (studentId: string, nextCohortId: string) => {
+    setApprovalCohortIds((current) => ({
+      ...current,
+      [studentId]: nextCohortId,
+    }));
+  };
+
+  const handleApprove = async (studentId: string) => {
+    const cohortIdToApprove = approvalCohortIds[studentId] ?? cohorts[0]?.id;
+
+    if (!cohortIdToApprove) {
+      setErrorMessage('승인할 기수를 먼저 선택해주세요.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      await studentApi.approve(studentId, cohortIdToApprove);
+      await loadStudents();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '학생을 승인하지 못했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReject = async (studentId: string) => {
+    const target = students.find((student) => student.id === studentId);
+    if (!target) return;
+    if (!window.confirm(`${target.name} 학생의 가입을 거절할까요?`)) return;
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      await studentApi.reject(studentId);
+      await loadStudents();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '학생 가입을 거절하지 못했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSuspend = async (studentId: string) => {
+    const target = students.find((student) => student.id === studentId);
+    if (!target) return;
+    if (!window.confirm(`${target.name} 학생을 이용 중지할까요?`)) return;
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      await studentApi.suspend(studentId);
+      await loadStudents();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '학생을 이용 중지하지 못했습니다.');
     } finally {
       setIsSubmitting(false);
     }
@@ -207,10 +250,8 @@ export function StudentPage() {
         <div>
           <p className="eyebrow">Student Management</p>
           <h1>학생관리</h1>
+          <p className="table-subtitle">학생은 카카오 로그인 후 승인대기 상태로 등록됩니다.</p>
         </div>
-        <button className="primary-button" type="button" onClick={() => setIsCreating(true)}>
-          학생 추가
-        </button>
       </section>
 
       <section className="dashboard-panel">
@@ -238,10 +279,10 @@ export function StudentPage() {
             <span>상태</span>
             <select value={status} onChange={(event) => handleStatusChange(event.target.value as StatusFilter)}>
               <option value="all">전체 상태</option>
-              <option value="active">재원</option>
-              <option value="paused">휴원</option>
-              <option value="inactive">휴면</option>
-              <option value="graduated">수료</option>
+              <option value="pending">승인대기</option>
+              <option value="approved">승인완료</option>
+              <option value="rejected">승인거절</option>
+              <option value="suspended">이용중지</option>
             </select>
           </label>
           <button className="secondary-button" type="button" onClick={resetFilters}>
@@ -252,7 +293,17 @@ export function StudentPage() {
         {errorMessage ? <p className="table-subtitle">{errorMessage}</p> : null}
         {isLoading ? <p className="table-subtitle">학생 목록을 불러오는 중입니다.</p> : null}
 
-        <StudentTable cohorts={cohorts} students={students} onDelete={handleDelete} onEdit={setEditingStudent} />
+        <StudentTable
+          approvalCohortIds={approvalCohortIds}
+          cohorts={cohorts}
+          students={students}
+          onApprovalCohortChange={handleApprovalCohortChange}
+          onApprove={handleApprove}
+          onDelete={handleDelete}
+          onEdit={setEditingStudent}
+          onReject={handleReject}
+          onSuspend={handleSuspend}
+        />
         <Pagination
           currentPage={currentPage}
           totalItems={totalItems}
@@ -261,21 +312,21 @@ export function StudentPage() {
         />
       </section>
 
-      {(isCreating || editingStudent) && (
+      {editingStudent && (
         <section className="dashboard-panel">
           <div className="panel-header">
             <div>
-              <h2>{isCreating ? '학생 추가' : '학생 수정'}</h2>
-              <p>학생 정보와 소속 기수는 저장 시 DB에 반영됩니다.</p>
+              <h2>학생 수정</h2>
+              <p>학생 상태와 소속 기수는 저장 시 DB에 반영됩니다.</p>
             </div>
           </div>
           <StudentForm
             cohorts={cohorts}
             disabled={isSubmitting}
             initialValues={editingStudent ? toFormValues(editingStudent) : undefined}
-            mode={isCreating ? 'create' : 'edit'}
+            mode="edit"
             onCancel={closeForm}
-            onSubmit={isCreating ? handleCreate : handleUpdate}
+            onSubmit={handleUpdate}
           />
         </section>
       )}

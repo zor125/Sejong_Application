@@ -1,7 +1,7 @@
 export type Role = 'admin' | 'teacher' | 'student';
 export type UserStatus = 'active' | 'inactive';
 export type CohortStatus = 'planned' | 'active' | 'completed';
-export type StudentStatus = 'active' | 'inactive' | 'paused' | 'graduated';
+export type StudentStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type QuestionType = 'multiple_choice';
 export type ContentStatus = 'draft' | 'published' | 'archived';
@@ -45,15 +45,15 @@ export type Cohort = {
 export type Student = {
   id: string;
   userId: string;
-  cohortId: string;
+  cohortId: string | null;
   name?: string;
   email?: string;
   phone?: string;
   birthDate?: string;
   studentNo?: string;
   status: StudentStatus;
-  enrolledAt: string;
-  enrolledOn?: string;
+  enrolledAt: string | null;
+  enrolledOn?: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;

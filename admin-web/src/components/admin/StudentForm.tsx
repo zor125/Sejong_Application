@@ -33,7 +33,7 @@ const emptyValues: StudentFormValues = {
   studentNo: '',
   cohortId: '',
   birthDate: '',
-  status: 'active',
+  status: 'approved',
   enrolledOn: '',
 };
 
@@ -65,7 +65,6 @@ export function StudentForm({ cohorts, disabled = false, initialValues, mode, on
         <label>
           <span>이메일</span>
           <input
-            required
             disabled={disabled}
             type="email"
             value={values.email}
@@ -85,7 +84,6 @@ export function StudentForm({ cohorts, disabled = false, initialValues, mode, on
         <label>
           <span>학생 번호</span>
           <input
-            required
             disabled={disabled}
             value={values.studentNo}
             onChange={(event) => setValues((current) => ({ ...current, studentNo: event.target.value }))}
@@ -95,7 +93,6 @@ export function StudentForm({ cohorts, disabled = false, initialValues, mode, on
         <label>
           <span>소속 기수</span>
           <select
-            required
             disabled={disabled}
             value={values.cohortId}
             onChange={(event) => setValues((current) => ({ ...current, cohortId: event.target.value }))}
@@ -116,10 +113,10 @@ export function StudentForm({ cohorts, disabled = false, initialValues, mode, on
               setValues((current) => ({ ...current, status: event.target.value as StudentStatus }))
             }
           >
-            <option value="active">재원</option>
-            <option value="paused">휴원</option>
-            <option value="inactive">휴면</option>
-            <option value="graduated">수료</option>
+            <option value="pending">승인대기</option>
+            <option value="approved">승인완료</option>
+            <option value="rejected">승인거절</option>
+            <option value="suspended">이용중지</option>
           </select>
         </label>
         <label>
@@ -134,7 +131,6 @@ export function StudentForm({ cohorts, disabled = false, initialValues, mode, on
         <label>
           <span>등록일</span>
           <input
-            required
             disabled={disabled}
             type="date"
             value={values.enrolledOn}

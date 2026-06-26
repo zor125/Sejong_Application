@@ -9,14 +9,18 @@ export type StudentApiItem = {
   email: string | null;
   phone: string | null;
   cohort: {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
   };
-  cohortId: string;
+  cohortId: string | null;
+  authProvider: string;
+  providerUserId: string | null;
   studentNo: string | null;
   status: StudentStatus;
-  enrolledOn: string;
+  enrolledOn: string | null;
   completedOn: string | null;
+  approvedAt: string | null;
+  approvedByTeacherId: string | null;
   memo?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -26,7 +30,7 @@ export type ListStudentsParams = {
   page: number;
   limit: number;
   keyword?: string;
-  cohortId?: string;
+  cohortId?: string | null;
   status?: StudentStatus;
 };
 
@@ -36,7 +40,7 @@ export type CreateStudentPayload = {
   email?: string | null;
   password: string;
   phone?: string | null;
-  cohortId: string;
+  cohortId?: string | null;
   studentNo?: string | null;
   status?: StudentStatus;
   enrolledOn: string;
@@ -104,5 +108,23 @@ export const studentApi = {
       method: 'DELETE',
     });
   },
-};
 
+  approve(studentId: string, cohortId: string) {
+    return apiRequest<StudentResponse>(`/admin/students/${studentId}/approve`, {
+      method: 'PATCH',
+      body: JSON.stringify({ cohortId }),
+    });
+  },
+
+  reject(studentId: string) {
+    return apiRequest<StudentResponse>(`/admin/students/${studentId}/reject`, {
+      method: 'PATCH',
+    });
+  },
+
+  suspend(studentId: string) {
+    return apiRequest<StudentResponse>(`/admin/students/${studentId}/suspend`, {
+      method: 'PATCH',
+    });
+  },
+};

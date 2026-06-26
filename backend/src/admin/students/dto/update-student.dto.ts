@@ -1,7 +1,7 @@
 import { IsEmail, IsIn, IsISO8601, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 import { StudentStatus } from '../student.types';
 
-const STUDENT_STATUSES: StudentStatus[] = ['active', 'inactive', 'paused', 'graduated'];
+const STUDENT_STATUSES: StudentStatus[] = ['pending', 'approved', 'rejected', 'suspended'];
 
 export class UpdateStudentDto {
   @IsOptional()

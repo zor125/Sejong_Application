@@ -3,6 +3,7 @@ import type { MainTab, SubmissionResult } from './student';
 
 export type RootStackParamList = {
   Login: undefined;
+  ApprovalStatus: undefined;
   CohortSelect: undefined;
   Main: {
     cohortId: string;

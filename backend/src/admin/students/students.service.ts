@@ -10,6 +10,7 @@ import { DatabaseService } from '../../database/database.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { ListStudentsDto } from './dto/list-students.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { ApproveStudentDto } from './dto/approve-student.dto';
 import { StudentResponse, StudentRow } from './student.types';
 
 type DbError = {
@@ -29,7 +30,7 @@ export class StudentsService {
     const whereClauses = [
       'students.deleted_at IS NULL',
       'users.deleted_at IS NULL',
-      'cohorts.deleted_at IS NULL',
+      '(students.cohort_id IS NULL OR cohorts.deleted_at IS NULL)',
     ];
 
     if (query.cohortId) {
@@ -71,7 +72,7 @@ export class StudentsService {
         `SELECT COUNT(*) AS total
          FROM students
          JOIN users ON users.id = students.user_id
-         JOIN cohorts ON cohorts.id = students.cohort_id
+         LEFT JOIN cohorts ON cohorts.id = students.cohort_id
          WHERE ${whereSql}`,
         values,
       ),
@@ -100,7 +101,9 @@ export class StudentsService {
 
     try {
       await client.query('BEGIN');
-      await this.assertCohortExists(client, body.cohortId);
+      if (body.cohortId) {
+        await this.assertCohortExists(client, body.cohortId);
+      }
 
       const passwordHash = await bcrypt.hash(body.password, 10);
       const userResult = await client.query<{ id: string }>(
@@ -119,7 +122,7 @@ export class StudentsService {
           body.name,
           body.email ?? null,
           passwordHash,
-          body.status === 'inactive' ? 'inactive' : 'active',
+          'active',
         ],
       );
 
@@ -133,6 +136,8 @@ export class StudentsService {
            (SELECT name FROM users WHERE users.id = students.user_id) AS name,
            (SELECT login_id FROM users WHERE users.id = students.user_id) AS login_id,
            (SELECT email FROM users WHERE users.id = students.user_id) AS email,
+           (SELECT auth_provider FROM users WHERE users.id = students.user_id) AS auth_provider,
+           (SELECT provider_user_id FROM users WHERE users.id = students.user_id) AS provider_user_id,
            students.phone,
            students.cohort_id,
            (SELECT name FROM cohorts WHERE cohorts.id = students.cohort_id) AS cohort_name,
@@ -140,6 +145,8 @@ export class StudentsService {
            students.status,
            students.enrolled_on::text AS enrolled_on,
            students.completed_on::text AS completed_on,
+           students.approved_at,
+           students.approved_by_teacher_id,
            students.memo,
            students.created_at,
            students.updated_at`,
@@ -148,8 +155,8 @@ export class StudentsService {
           body.cohortId,
           body.phone ?? null,
           body.studentNo ?? null,
-          body.status ?? 'active',
-          body.enrolledOn,
+          body.status ?? 'approved',
+          body.enrolledOn ?? null,
           body.completedOn ?? null,
           body.memo ?? null,
         ],
@@ -203,11 +210,7 @@ export class StudentsService {
             body.name ?? null,
             body.loginId ?? null,
             body.email === undefined ? current.email : body.email,
-            body.status === undefined
-              ? null
-              : body.status === 'inactive'
-                ? 'inactive'
-                : 'active',
+            null,
           ],
         );
       }
@@ -231,6 +234,8 @@ export class StudentsService {
            (SELECT name FROM users WHERE users.id = students.user_id) AS name,
            (SELECT login_id FROM users WHERE users.id = students.user_id) AS login_id,
            (SELECT email FROM users WHERE users.id = students.user_id) AS email,
+           (SELECT auth_provider FROM users WHERE users.id = students.user_id) AS auth_provider,
+           (SELECT provider_user_id FROM users WHERE users.id = students.user_id) AS provider_user_id,
            students.phone,
            students.cohort_id,
            (SELECT name FROM cohorts WHERE cohorts.id = students.cohort_id) AS cohort_name,
@@ -238,6 +243,8 @@ export class StudentsService {
            students.status,
            students.enrolled_on::text AS enrolled_on,
            students.completed_on::text AS completed_on,
+           students.approved_at,
+           students.approved_by_teacher_id,
            students.memo,
            students.created_at,
            students.updated_at`,
@@ -287,6 +294,70 @@ export class StudentsService {
     }
   }
 
+  async approveStudent(studentId: string, body: ApproveStudentDto, approvedByUserId?: string) {
+    const current = await this.findStudentById(studentId);
+    const pool = this.databaseService.getPool();
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      await this.assertCohortExists(client, body.cohortId);
+      const teacherId = approvedByUserId
+        ? await this.findTeacherIdByUserId(client, approvedByUserId)
+        : null;
+
+      const result = await client.query<StudentRow>(
+        `UPDATE students
+         SET
+           cohort_id = $2,
+           status = 'approved',
+           enrolled_on = COALESCE(enrolled_on, CURRENT_DATE),
+           approved_at = now(),
+           approved_by_teacher_id = $3,
+           updated_at = now()
+         WHERE id = $1
+           AND deleted_at IS NULL
+         RETURNING
+           students.id,
+           students.user_id,
+           (SELECT name FROM users WHERE users.id = students.user_id) AS name,
+           (SELECT login_id FROM users WHERE users.id = students.user_id) AS login_id,
+           (SELECT email FROM users WHERE users.id = students.user_id) AS email,
+           (SELECT auth_provider FROM users WHERE users.id = students.user_id) AS auth_provider,
+           (SELECT provider_user_id FROM users WHERE users.id = students.user_id) AS provider_user_id,
+           students.phone,
+           students.cohort_id,
+           (SELECT name FROM cohorts WHERE cohorts.id = students.cohort_id) AS cohort_name,
+           students.student_no,
+           students.status,
+           students.enrolled_on::text AS enrolled_on,
+           students.completed_on::text AS completed_on,
+           students.approved_at,
+           students.approved_by_teacher_id,
+           students.memo,
+           students.created_at,
+           students.updated_at`,
+        [current.id, body.cohortId, teacherId],
+      );
+
+      await client.query('COMMIT');
+      return { data: this.toResponse(result.rows[0], true) };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async rejectStudent(studentId: string) {
+    return this.updateApprovalStatus(studentId, 'rejected');
+  }
+
+  async suspendStudent(studentId: string) {
+    return this.updateApprovalStatus(studentId, 'suspended');
+  }
+
   private baseSelectSql(): string {
     return `SELECT
       students.id,
@@ -294,6 +365,8 @@ export class StudentsService {
       users.name,
       users.login_id,
       users.email,
+      users.auth_provider,
+      users.provider_user_id,
       students.phone,
       students.cohort_id,
       cohorts.name AS cohort_name,
@@ -301,12 +374,14 @@ export class StudentsService {
       students.status,
       students.enrolled_on::text AS enrolled_on,
       students.completed_on::text AS completed_on,
+      students.approved_at,
+      students.approved_by_teacher_id,
       students.memo,
       students.created_at,
       students.updated_at
     FROM students
     JOIN users ON users.id = students.user_id
-    JOIN cohorts ON cohorts.id = students.cohort_id`;
+    LEFT JOIN cohorts ON cohorts.id = students.cohort_id`;
   }
 
   private insertStudentSql(): string {
@@ -329,7 +404,7 @@ export class StudentsService {
        WHERE students.id = $1
          AND students.deleted_at IS NULL
          AND users.deleted_at IS NULL
-         AND cohorts.deleted_at IS NULL
+         AND (students.cohort_id IS NULL OR cohorts.deleted_at IS NULL)
        LIMIT 1`,
       [studentId],
     );
@@ -377,10 +452,14 @@ export class StudentsService {
         name: row.cohort_name,
       },
       cohortId: row.cohort_id,
+      authProvider: row.auth_provider,
+      providerUserId: row.provider_user_id,
       studentNo: row.student_no,
       status: row.status,
-      enrolledOn: this.toDateString(row.enrolled_on) ?? '',
+      enrolledOn: this.toDateString(row.enrolled_on),
       completedOn: this.toDateString(row.completed_on),
+      approvedAt: row.approved_at?.toISOString() ?? null,
+      approvedByTeacherId: row.approved_by_teacher_id,
       ...(includeMemo ? { memo: row.memo } : {}),
       createdAt: row.created_at.toISOString(),
       updatedAt: row.updated_at.toISOString(),
@@ -439,6 +518,53 @@ export class StudentsService {
     }
 
     throw error;
+  }
+
+  private async updateApprovalStatus(studentId: string, status: 'rejected' | 'suspended') {
+    const current = await this.findStudentById(studentId);
+    const result = await this.databaseService.getPool().query<StudentRow>(
+      `UPDATE students
+       SET status = $2,
+           updated_at = now()
+       WHERE id = $1
+         AND deleted_at IS NULL
+       RETURNING
+         students.id,
+         students.user_id,
+         (SELECT name FROM users WHERE users.id = students.user_id) AS name,
+         (SELECT login_id FROM users WHERE users.id = students.user_id) AS login_id,
+         (SELECT email FROM users WHERE users.id = students.user_id) AS email,
+         (SELECT auth_provider FROM users WHERE users.id = students.user_id) AS auth_provider,
+         (SELECT provider_user_id FROM users WHERE users.id = students.user_id) AS provider_user_id,
+         students.phone,
+         students.cohort_id,
+         (SELECT name FROM cohorts WHERE cohorts.id = students.cohort_id) AS cohort_name,
+         students.student_no,
+         students.status,
+         students.enrolled_on::text AS enrolled_on,
+         students.completed_on::text AS completed_on,
+         students.approved_at,
+         students.approved_by_teacher_id,
+         students.memo,
+         students.created_at,
+         students.updated_at`,
+      [current.id, status],
+    );
+
+    return { data: this.toResponse(result.rows[0], true) };
+  }
+
+  private async findTeacherIdByUserId(client: PoolClient, userId: string): Promise<string | null> {
+    const result = await client.query<{ id: string }>(
+      `SELECT id
+       FROM teachers
+       WHERE user_id = $1
+         AND deleted_at IS NULL
+       LIMIT 1`,
+      [userId],
+    );
+
+    return result.rows[0]?.id ?? null;
   }
 
   private notFound(): NotFoundException {

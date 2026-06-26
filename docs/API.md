@@ -1,3 +1,52 @@
+# Kakao 학생 가입 승인제 추가 명세
+
+## 학생 상태
+
+학생 상태값은 `pending`, `approved`, `rejected`, `suspended`를 사용한다.
+
+- `pending`: 카카오 최초 로그인 후 강사 승인 대기
+- `approved`: 강사가 기수를 배정하고 승인 완료
+- `rejected`: 가입 승인 거절
+- `suspended`: 이용 중지
+
+## 승인 전후 JWT 정책
+
+- `pending`, `rejected`, `suspended` 학생에게는 일반 Student JWT를 발급하지 않는다.
+- `approved` 상태이고 `cohortId`가 배정된 학생에게만 Student JWT를 발급한다.
+- Student API는 JWT role 검증 후에도 DB의 학생 상태가 `approved`인지 재검증한다.
+
+## Admin 학생 승인 API
+
+| 항목 | 내용 |
+| --- | --- |
+| Method | `PATCH` |
+| URL | `/api/admin/students/{studentId}/approve` |
+| StatusCode | `200`, `400`, `401`, `403`, `404`, `422` |
+
+Request:
+
+```json
+{
+  "cohortId": "cohort-uuid"
+}
+```
+
+## Admin 학생 승인 거절 API
+
+| 항목 | 내용 |
+| --- | --- |
+| Method | `PATCH` |
+| URL | `/api/admin/students/{studentId}/reject` |
+| StatusCode | `200`, `401`, `403`, `404` |
+
+## Admin 학생 이용 중지 API
+
+| 항목 | 내용 |
+| --- | --- |
+| Method | `PATCH` |
+| URL | `/api/admin/students/{studentId}/suspend` |
+| StatusCode | `200`, `401`, `403`, `404` |
+
 # API
 
 ## 개요
@@ -90,22 +139,87 @@ Response:
 }
 ```
 
-### 학생 로그인
+### 학생 카카오 인가 URL 발급
+
+| 항목 | 내용 |
+| --- | --- |
+| Method | `GET` |
+| URL | `/api/auth/student/kakao/authorize` |
+| StatusCode | `200`, `400`, `500` |
+
+Query parameters: `redirectUri`
+
+Response:
+
+```json
+{
+  "data": {
+    "authorizationUrl": "https://kauth.kakao.com/oauth/authorize?..."
+  }
+}
+```
+
+### 학생 카카오 로그인 완료
+
+카카오 authorization code를 Backend가 token으로 교환하고 카카오 사용자 정보를 조회한다. 학생 식별 기준은 카카오 고유 사용자 ID이며 닉네임·이메일은 식별 기준으로 사용하지 않는다.
 
 | 항목 | 내용 |
 | --- | --- |
 | Method | `POST` |
-| URL | `/api/auth/student/login` |
-| StatusCode | `200`, `400`, `401`, `403` |
+| URL | `/api/auth/student/kakao/callback` |
+| StatusCode | `200`, `400`, `401`, `403`, `500` |
 
 Request:
 
 ```json
 {
-  "loginId": "student01",
-  "password": "password"
+  "code": "kakao-authorization-code",
+  "redirectUri": "https://student-app.example.com"
 }
 ```
+
+Pending / rejected / suspended Response:
+
+```json
+{
+  "data": {
+    "status": "pending",
+    "student": {
+      "id": "student-uuid",
+      "name": "카카오 학생",
+      "email": "student@example.com",
+      "cohortId": null,
+      "status": "pending"
+    }
+  }
+}
+```
+
+Approved Response:
+
+```json
+{
+  "data": {
+    "status": "approved",
+    "accessToken": "jwt-access-token",
+    "user": {
+      "id": "user-uuid",
+      "role": "student",
+      "name": "학생명",
+      "loginId": "kakao:123456789",
+      "studentId": "student-uuid",
+      "cohortId": "cohort-uuid"
+    }
+  }
+}
+```
+
+정책:
+
+- 신규 카카오 학생은 `pending` 상태로 생성한다.
+- `pending`, `rejected`, `suspended` 학생에게는 일반 Student JWT를 발급하지 않는다.
+- `approved`이고 기수가 배정된 학생만 Student JWT를 발급받는다.
+- 학생 API는 JWT 검증 후에도 DB의 학생 상태가 `approved`인지 다시 확인한다.
 
 Response:
 
