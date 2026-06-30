@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { ApiConfigurationError, ApiNetworkError } from '../api/client';
 import { useAuth } from '../state/AuthContext';
 import type { ScreenProps } from '../types/navigation';
+import { brand } from '../theme/brand';
 
 const KAKAO_CALLBACK_SCHEME = 'nursing-student-app://kakao/oauth';
 const KAKAO_OAUTH_STATE_STORAGE_KEY = 'sejong_kakao_oauth_state';
@@ -218,19 +219,17 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
   return (
     <Screen>
       <View style={styles.container}>
-        <View style={styles.logo}>
-          <Text style={styles.logoText}>문</Text>
-        </View>
+        <Image source={require('../../assets/sgne-logo.png')} style={styles.logo} resizeMode="contain" />
 
         <View style={styles.header}>
           <Text style={styles.kicker}>NURSING ACADEMY</Text>
-          <Text style={styles.title}>간호문제</Text>
+          <Text style={styles.title}>세종고은간호전문학원</Text>
           <Text style={styles.description}>카카오 로그인 후 강사 승인이 완료되면 문제집을 풀이할 수 있습니다.</Text>
         </View>
 
         <View style={styles.form}>
           {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-          <PrimaryButton disabled={isLoading} onPress={handleKakaoLogin}>
+          <PrimaryButton disabled={isLoading} variant="kakao" onPress={handleKakaoLogin}>
             {isLoading ? '카카오 로그인 중...' : '카카오로 로그인'}
           </PrimaryButton>
           <Text style={styles.helperText}>
@@ -247,40 +246,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: brand.colors.background,
   },
   logo: {
-    width: 62,
-    height: 62,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 96,
+    height: 94,
     marginBottom: 26,
-    borderRadius: 22,
-    backgroundColor: '#FEE500',
-  },
-  logoText: {
-    color: '#171717',
-    fontSize: 24,
-    fontWeight: '900',
   },
   header: {
     marginBottom: 32,
   },
   kicker: {
     marginBottom: 8,
-    color: '#2563EB',
+    color: brand.colors.primary,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 1,
   },
   title: {
-    color: '#172554',
-    fontSize: 36,
+    color: brand.colors.textPrimary,
+    fontSize: 34,
     fontWeight: '900',
   },
   description: {
     marginTop: 8,
-    color: '#6B7280',
+    color: brand.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -289,12 +279,12 @@ const styles = StyleSheet.create({
   },
   errorText: {
     marginBottom: 8,
-    color: '#DC2626',
+    color: brand.colors.danger,
     fontSize: 13,
     fontWeight: '800',
   },
   helperText: {
-    color: '#64748B',
+    color: brand.colors.textSecondary,
     fontSize: 13,
     lineHeight: 19,
     textAlign: 'center',

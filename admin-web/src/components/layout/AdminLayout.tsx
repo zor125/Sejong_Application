@@ -23,7 +23,13 @@ export function AdminLayout() {
   return (
     <div className="admin-layout">
       <aside>
-        <strong>Sejong Admin</strong>
+        <div className="sidebar-brand">
+          <img src="/sgne-logo.png" alt="세종고은간호전문학원 로고" />
+          <div>
+            <strong>세종고은간호전문학원</strong>
+            <span>Sejong Admin</span>
+          </div>
+        </div>
         <nav>
           {menuItems.map((item) => (
             <NavLink key={item.to} to={item.to}>

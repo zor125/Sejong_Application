@@ -102,7 +102,7 @@ export function WrongAnswerScreen({ cohortId, submissions }: WrongAnswerScreenPr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   content: {
     padding: 16,
@@ -112,16 +112,16 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     padding: 20,
     borderRadius: 22,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E7F6EC',
   },
   heroTitle: {
-    color: '#1E3A8A',
+    color: '#087437',
     fontSize: 18,
     fontWeight: '900',
   },
   heroDescription: {
     marginTop: 8,
-    color: '#1D4ED8',
+    color: '#087437',
     fontSize: 13,
     lineHeight: 19,
   },
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingLeft: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#BFDBFE',
+    borderLeftColor: '#BFE8CB',
   },
   emptyCard: {
     alignItems: 'center',
@@ -150,21 +150,21 @@ const styles = StyleSheet.create({
     paddingTop: 9,
     overflow: 'hidden',
     borderRadius: 27,
-    color: '#1D4ED8',
-    backgroundColor: '#DBEAFE',
+    color: '#087437',
+    backgroundColor: '#E7F6EC',
     fontSize: 25,
     fontWeight: '900',
     textAlign: 'center',
   },
   emptyTitle: {
     marginTop: 18,
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 18,
     fontWeight: '900',
   },
   emptyDescription: {
     marginTop: 8,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 13,
     lineHeight: 19,
     textAlign: 'center',

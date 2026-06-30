@@ -9,7 +9,7 @@ const AUTH_EXPIRED_MESSAGE_STORAGE_KEY = 'sejong_admin_auth_expired_message';
 
 const loginPageStyle: CSSProperties = {
   alignItems: 'center',
-  background: '#f3f4f6',
+  background: 'linear-gradient(135deg, #F3FBF5 0%, #FFFFFF 48%, #E7F6EC 100%)',
   display: 'flex',
   minHeight: '100vh',
   padding: 24,
@@ -126,9 +126,10 @@ export function LoginPage() {
       <section className="dashboard-panel" style={loginPanelStyle}>
         <div className="panel-header">
           <div>
+            <img className="login-brand-logo" src="/sgne-logo.png" alt="세종고은간호전문학원 로고" />
             <p className="eyebrow">Admin Login</p>
-            <h2>강사용 웹 로그인</h2>
-            <p>관리자 계정으로 로그인하세요.</p>
+            <h2>세종고은간호전문학원</h2>
+            <p>강사용 관리 시스템에 로그인하세요.</p>
           </div>
         </div>
 

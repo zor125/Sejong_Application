@@ -177,7 +177,7 @@ export function WorkbookSolveScreen({ navigation, route }: ScreenProps<'Workbook
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   progressHeader: {
     paddingHorizontal: 18,
@@ -194,12 +194,12 @@ const styles = StyleSheet.create({
   workbookTitle: {
     flex: 1,
     marginRight: 16,
-    color: '#475569',
+    color: '#66706A',
     fontSize: 13,
     fontWeight: '700',
   },
   count: {
-    color: '#1D4ED8',
+    color: '#087437',
     fontSize: 14,
     fontWeight: '900',
   },
@@ -207,12 +207,12 @@ const styles = StyleSheet.create({
     height: 8,
     overflow: 'hidden',
     borderRadius: 999,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#DCE6DF',
   },
   progressFill: {
     height: '100%',
     borderRadius: 999,
-    backgroundColor: '#2563EB',
+    backgroundColor: '#0B9444',
   },
   scrollView: {
     flex: 1,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 18,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#DCE6DF',
     backgroundColor: '#FFFFFF',
   },
   buttonItem: {
@@ -239,16 +239,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 20,
     padding: 24,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   emptyTitle: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 20,
     fontWeight: '900',
     textAlign: 'center',
   },
   errorText: {
-    color: '#DC2626',
+    color: '#D14343',
     fontSize: 13,
     fontWeight: '800',
     textAlign: 'center',

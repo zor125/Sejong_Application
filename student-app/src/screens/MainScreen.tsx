@@ -138,7 +138,7 @@ export function MainScreen({ navigation, route }: ScreenProps<'Main'>) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   contentArea: {
     flex: 1,
@@ -149,16 +149,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
     padding: 24,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   centerTitle: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 18,
     fontWeight: '900',
     textAlign: 'center',
   },
   centerDescription: {
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 13,
     textAlign: 'center',
   },

@@ -127,7 +127,7 @@ export function ResultScreen({ navigation, route }: ScreenProps<'Result'>) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   content: {
     padding: 16,
@@ -145,28 +145,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 14,
     borderRadius: 32,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E7F6EC',
   },
   icon: {
-    color: '#1D4ED8',
+    color: '#087437',
     fontSize: 30,
     fontWeight: '900',
   },
   kicker: {
-    color: '#2563EB',
+    color: '#0B9444',
     fontSize: 12,
     fontWeight: '900',
     letterSpacing: 1,
   },
   title: {
     marginTop: 5,
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 48,
     fontWeight: '900',
   },
   workbookTitle: {
     marginTop: 6,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 14,
     textAlign: 'center',
   },
@@ -177,12 +177,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 19,
     fontWeight: '900',
   },
   sectionCount: {
-    color: '#DC2626',
+    color: '#D14343',
     fontSize: 13,
     fontWeight: '900',
   },
@@ -193,16 +193,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 24,
     borderRadius: 20,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#F3FBF5',
   },
   perfectTitle: {
-    color: '#1D4ED8',
+    color: '#087437',
     fontSize: 17,
     fontWeight: '900',
   },
   perfectDescription: {
     marginTop: 7,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 13,
     textAlign: 'center',
   },
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 18,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#DCE6DF',
     backgroundColor: '#FFFFFF',
   },
   buttonItem: {
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   emptyCard: {
     padding: 24,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   emptyTitle: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 21,
     fontWeight: '900',
     textAlign: 'center',
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   emptyDescription: {
     marginTop: 9,
     marginBottom: 22,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 14,
     lineHeight: 21,
     textAlign: 'center',

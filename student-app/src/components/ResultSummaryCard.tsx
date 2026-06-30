@@ -50,20 +50,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rateLabel: {
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 13,
     fontWeight: '700',
   },
   rate: {
     marginTop: 5,
-    color: '#1D4ED8',
+    color: '#087437',
     fontSize: 40,
     fontWeight: '900',
   },
   divider: {
     height: 1,
     marginVertical: 20,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#DCE6DF',
   },
   stats: {
     flexDirection: 'row',
@@ -73,19 +73,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 22,
     fontWeight: '900',
   },
   correct: {
-    color: '#2563EB',
+    color: '#0B9444',
   },
   wrong: {
-    color: '#DC2626',
+    color: '#D14343',
   },
   statLabel: {
     marginTop: 4,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 12,
     fontWeight: '700',
   },

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { Choice } from '../types/student';
+import { brand } from '../theme/brand';
 
 type ChoiceOptionProps = {
   choice: Choice;
@@ -30,14 +31,14 @@ const styles = StyleSheet.create({
     minHeight: 62,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: brand.colors.border,
     borderRadius: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: brand.colors.surface,
   },
   selectedOption: {
     borderWidth: 2,
-    borderColor: '#2563EB',
-    backgroundColor: '#EFF6FF',
+    borderColor: brand.colors.primary,
+    backgroundColor: brand.colors.primarySoft,
   },
   number: {
     width: 32,
@@ -46,28 +47,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
     borderRadius: 16,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: brand.colors.surfaceMuted,
   },
   selectedNumber: {
-    backgroundColor: '#2563EB',
+    backgroundColor: brand.colors.primary,
   },
   numberText: {
-    color: '#475569',
+    color: brand.colors.textSecondary,
     fontSize: 13,
     fontWeight: '800',
   },
   selectedNumberText: {
-    color: '#FFFFFF',
+    color: brand.colors.surface,
   },
   text: {
     flex: 1,
-    color: '#334155',
+    color: brand.colors.textPrimary,
     fontSize: 15,
     fontWeight: '600',
     lineHeight: 22,
   },
   selectedText: {
-    color: '#1E3A8A',
+    color: brand.colors.primaryDark,
   },
   radio: {
     width: 20,
@@ -76,16 +77,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 10,
     borderWidth: 2,
-    borderColor: '#CBD5E1',
+    borderColor: brand.colors.border,
     borderRadius: 10,
   },
   selectedRadio: {
-    borderColor: '#2563EB',
+    borderColor: brand.colors.primary,
   },
   radioDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#2563EB',
+    backgroundColor: brand.colors.primary,
   },
 });

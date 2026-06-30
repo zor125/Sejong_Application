@@ -126,7 +126,7 @@ export function WorkbookListScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   content: {
     padding: 16,
@@ -139,13 +139,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   noticeTitle: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 17,
     fontWeight: '900',
   },
   noticeDescription: {
     marginTop: 6,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 13,
   },
   filterRow: {
@@ -157,16 +157,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 9,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#DCE6DF',
     borderRadius: 999,
     backgroundColor: '#FFFFFF',
   },
   activeChip: {
-    borderColor: '#2563EB',
-    backgroundColor: '#2563EB',
+    borderColor: '#0B9444',
+    backgroundColor: '#0B9444',
   },
   filterText: {
-    color: '#334155',
+    color: '#1A1F1B',
     fontWeight: '800',
   },
   activeFilterText: {
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   subjectLabel: {
     marginBottom: 9,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -189,21 +189,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#DCE3EC',
+    borderColor: '#DCE6DF',
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
   },
   activeSubjectChip: {
-    borderColor: '#93C5FD',
-    backgroundColor: '#EFF6FF',
+    borderColor: '#A9DDB9',
+    backgroundColor: '#F3FBF5',
   },
   subjectText: {
-    color: '#475569',
+    color: '#66706A',
     fontSize: 13,
     fontWeight: '700',
   },
   activeSubjectText: {
-    color: '#1D4ED8',
+    color: '#087437',
     fontWeight: '900',
   },
   emptyCard: {
@@ -213,13 +213,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   emptyTitle: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 16,
     fontWeight: '900',
   },
   emptyDescription: {
     marginTop: 7,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 13,
   },
 });
