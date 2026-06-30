@@ -19,6 +19,9 @@ export type QuestionRow = {
 
 type QuestionTableProps = {
   questions: QuestionRow[];
+  selectedQuestionIds?: Set<string>;
+  onToggleSelect?: (questionId: string) => void;
+  onToggleSelectAll?: () => void;
   onDelete: (questionId: string) => void;
   onEdit: (question: QuestionRow) => void;
 };
@@ -44,12 +47,31 @@ const contentPreviewStyle: CSSProperties = {
   whiteSpace: 'normal',
 };
 
-export function QuestionTable({ questions, onDelete, onEdit }: QuestionTableProps) {
+export function QuestionTable({
+  questions,
+  selectedQuestionIds = new Set<string>(),
+  onToggleSelect,
+  onToggleSelectAll,
+  onDelete,
+  onEdit,
+}: QuestionTableProps) {
+  const hasRows = questions.length > 0;
+  const allVisibleSelected = hasRows && questions.every((question) => selectedQuestionIds.has(question.id));
+
   return (
     <div className="table-wrap">
       <table>
         <thead>
           <tr>
+            <th>
+              <input
+                aria-label="현재 페이지 문제 전체 선택"
+                checked={allVisibleSelected}
+                disabled={!hasRows || !onToggleSelectAll}
+                type="checkbox"
+                onChange={onToggleSelectAll}
+              />
+            </th>
             <th>문제</th>
             <th>과목</th>
             <th>카테고리</th>
@@ -64,6 +86,15 @@ export function QuestionTable({ questions, onDelete, onEdit }: QuestionTableProp
         <tbody>
           {questions.map((question) => (
             <tr key={question.id}>
+              <td>
+                <input
+                  aria-label={`문항 선택: ${question.content.slice(0, 30)}`}
+                  checked={selectedQuestionIds.has(question.id)}
+                  disabled={!onToggleSelect}
+                  type="checkbox"
+                  onChange={() => onToggleSelect?.(question.id)}
+                />
+              </td>
               <td>
                 <div className="table-title" style={contentPreviewStyle}>
                   {question.content}
@@ -95,7 +126,7 @@ export function QuestionTable({ questions, onDelete, onEdit }: QuestionTableProp
           ))}
           {questions.length === 0 ? (
             <tr>
-              <td className="empty-cell" colSpan={9}>
+              <td className="empty-cell" colSpan={10}>
                 검색 결과가 없습니다.
               </td>
             </tr>

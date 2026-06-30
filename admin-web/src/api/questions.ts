@@ -68,6 +68,11 @@ export type PdfQuestionImportConfirmItem = {
   correctAnswerIndex: number;
 };
 
+export type BulkUpdateQuestionStatusPayload = {
+  questionIds: string[];
+  status: ContentStatus;
+};
+
 type QuestionListResponse = {
   data: QuestionApiItem[];
   meta: {
@@ -97,6 +102,14 @@ type PdfQuestionImportConfirmResponse = {
   data: {
     createdCount: number;
     questions: QuestionApiItem[];
+  };
+};
+
+type BulkUpdateQuestionStatusResponse = {
+  data: {
+    updatedCount: number;
+    status: ContentStatus;
+    questionIds: string[];
   };
 };
 
@@ -168,6 +181,13 @@ export const questionApi = {
         permissionConfirmed,
         questions,
       }),
+    });
+  },
+
+  bulkUpdateStatus(payload: BulkUpdateQuestionStatusPayload) {
+    return apiRequest<BulkUpdateQuestionStatusResponse>('/admin/questions/bulk/status', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
     });
   },
 
