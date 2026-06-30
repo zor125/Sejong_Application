@@ -7,6 +7,7 @@ import { ApiConfigurationError, ApiNetworkError } from '../api/client';
 import { useAuth } from '../state/AuthContext';
 import type { ScreenProps } from '../types/navigation';
 import { brand } from '../theme/brand';
+import sgneLogo from '../../assets/sgne-logo.png';
 
 const KAKAO_CALLBACK_SCHEME = 'nursing-student-app://kakao/oauth';
 const KAKAO_OAUTH_STATE_STORAGE_KEY = 'sejong_kakao_oauth_state';
@@ -219,7 +220,7 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
   return (
     <Screen>
       <View style={styles.container}>
-        <Image source={require('../../assets/sgne-logo.png')} style={styles.logo} resizeMode="contain" />
+        <Image source={{ uri: sgneLogo }} style={styles.logo} resizeMode="contain" />
 
         <View style={styles.header}>
           <Text style={styles.kicker}>NURSING ACADEMY</Text>

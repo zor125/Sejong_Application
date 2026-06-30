@@ -1,5 +1,6 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { brand } from '../theme/brand';
+import sgneLogo from '../../assets/sgne-logo.png';
 
 type AppHeaderProps = {
   title: string;
@@ -11,7 +12,7 @@ export function AppHeader({ title, subtitle, onProfilePress }: AppHeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.brandArea}>
-        <Image source={require('../../assets/sgne-logo.png')} style={styles.logo} resizeMode="contain" />
+        <Image source={{ uri: sgneLogo }} style={styles.logo} resizeMode="contain" />
         <View>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
           <Text style={styles.title}>{title}</Text>
