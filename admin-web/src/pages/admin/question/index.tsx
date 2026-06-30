@@ -89,6 +89,10 @@ export function QuestionPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<Set<string>>(new Set());
+  const [bulkTargetStatus, setBulkTargetStatus] = useState<ContentStatus>('published');
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+  const [bulkSuccessMessage, setBulkSuccessMessage] = useState('');
   const [isPdfImportOpen, setIsPdfImportOpen] = useState(false);
   const [questionPdfFile, setQuestionPdfFile] = useState<File | null>(null);
   const [answerPdfFile, setAnswerPdfFile] = useState<File | null>(null);
@@ -101,6 +105,7 @@ export function QuestionPage() {
 
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
+  const selectedQuestionCount = selectedQuestionIds.size;
   const selectedImportQuestions = importQuestions.filter(
     (question) =>
       question.included &&
@@ -157,10 +162,12 @@ export function QuestionPage() {
 
       setQuestions(response.data.map(toRow));
       setTotalItems(response.meta.total);
+      setSelectedQuestionIds(new Set());
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : '문제 목록을 불러오지 못했습니다.');
       setQuestions([]);
       setTotalItems(0);
+      setSelectedQuestionIds(new Set());
     } finally {
       setIsLoading(false);
     }
@@ -213,6 +220,63 @@ export function QuestionPage() {
     setDifficulty('all');
     setStatus('all');
     setPage(1);
+    setSelectedQuestionIds(new Set());
+  };
+
+  const toggleQuestionSelection = (questionId: string) => {
+    setBulkSuccessMessage('');
+    setSelectedQuestionIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(questionId)) {
+        next.delete(questionId);
+      } else {
+        next.add(questionId);
+      }
+
+      return next;
+    });
+  };
+
+  const toggleVisibleQuestionSelection = () => {
+    setBulkSuccessMessage('');
+    setSelectedQuestionIds((current) => {
+      const visibleIds = questions.map((question) => question.id);
+      const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((questionId) => current.has(questionId));
+
+      return allVisibleSelected ? new Set() : new Set(visibleIds);
+    });
+  };
+
+  const handleBulkUpdateStatus = async () => {
+    if (selectedQuestionCount === 0) return;
+
+    const confirmed = window.confirm(
+      `선택한 문제 ${selectedQuestionCount}개의 상태를 '${QuestionStatusOptions.find((option) => option.value === bulkTargetStatus)?.label ?? bulkTargetStatus}'(으)로 변경할까요?`,
+    );
+
+    if (!confirmed) return;
+
+    setIsBulkUpdating(true);
+    setErrorMessage('');
+    setBulkSuccessMessage('');
+
+    try {
+      const response = await questionApi.bulkUpdateStatus({
+        questionIds: Array.from(selectedQuestionIds),
+        status: bulkTargetStatus,
+      });
+
+      setBulkSuccessMessage(
+        `${response.data.updatedCount}개 문제 상태가 ${QuestionStatusOptions.find((option) => option.value === response.data.status)?.label ?? response.data.status}(으)로 변경되었습니다.`,
+      );
+      setSelectedQuestionIds(new Set());
+      await Promise.all([loadQuestions(currentPage), loadFilterOptions()]);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '문제 상태를 일괄 변경하지 못했습니다.');
+    } finally {
+      setIsBulkUpdating(false);
+    }
   };
 
   const resetPdfImport = () => {
@@ -703,9 +767,43 @@ export function QuestionPage() {
         </div>
 
         {errorMessage ? <p className="table-subtitle">{errorMessage}</p> : null}
+        {bulkSuccessMessage ? <p className="table-subtitle">{bulkSuccessMessage}</p> : null}
         {isLoading ? <p className="table-subtitle">문제 목록을 불러오는 중입니다.</p> : null}
 
-        <QuestionTable questions={questions} onDelete={handleDelete} onEdit={setEditingQuestion} />
+        <div className="toolbar">
+          <span className="table-subtitle">선택된 문제 {selectedQuestionCount}개</span>
+          <label className="search-field">
+            <span>변경할 상태</span>
+            <select
+              disabled={isBulkUpdating}
+              value={bulkTargetStatus}
+              onChange={(event) => setBulkTargetStatus(event.target.value as ContentStatus)}
+            >
+              {QuestionStatusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="secondary-button"
+            disabled={selectedQuestionCount === 0 || isBulkUpdating}
+            type="button"
+            onClick={() => void handleBulkUpdateStatus()}
+          >
+            {isBulkUpdating ? '상태 변경 중...' : '선택 상태 일괄 변경'}
+          </button>
+        </div>
+
+        <QuestionTable
+          questions={questions}
+          selectedQuestionIds={selectedQuestionIds}
+          onDelete={handleDelete}
+          onEdit={setEditingQuestion}
+          onToggleSelect={toggleQuestionSelection}
+          onToggleSelectAll={toggleVisibleQuestionSelection}
+        />
         <Pagination
           currentPage={currentPage}
           totalItems={totalItems}

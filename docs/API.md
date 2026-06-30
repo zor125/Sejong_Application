@@ -1014,6 +1014,53 @@ Response:
 }
 ```
 
+### 문제 상태 일괄 변경
+
+선택한 문제들의 상태를 한 번에 변경한다. 문제 데이터만 갱신하며 문제집, 배포, 제출, 성적, 오답 데이터는 삭제하거나 수정하지 않는다.
+
+| 항목 | 내용 |
+| --- | --- |
+| Method | `PATCH` |
+| URL | `/api/admin/questions/bulk/status` |
+| StatusCode | `200`, `400`, `401`, `403`, `422` |
+
+Request:
+
+```json
+{
+  "questionIds": [
+    "question-uuid-1",
+    "question-uuid-2",
+    "question-uuid-3"
+  ],
+  "status": "published"
+}
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "updatedCount": 3,
+    "status": "published",
+    "questionIds": [
+      "question-uuid-1",
+      "question-uuid-2",
+      "question-uuid-3"
+    ]
+  }
+}
+```
+
+검증 규칙:
+
+- `questionIds`는 1개 이상의 UUID 배열이어야 하며 중복 ID는 허용하지 않는다.
+- `status`는 `draft`, `published`, `archived` 중 하나여야 한다.
+- 존재하지 않거나 삭제된 문제가 하나라도 포함되면 전체 변경을 실패 처리한다.
+- `published` 문제만 신규 문제집 문항 선택 대상으로 사용할 수 있다.
+- `archived`로 변경해도 기존 문제집에 이미 포함된 문항과 제출·성적 기록은 유지된다.
+
 ### 문제 삭제
 
 | 항목 | 내용 |
