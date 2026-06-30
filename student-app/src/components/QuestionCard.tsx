@@ -55,13 +55,13 @@ const styles = StyleSheet.create({
   },
   number: {
     marginBottom: 12,
-    color: '#2563EB',
+    color: '#0B9444',
     fontSize: 12,
     fontWeight: '900',
     letterSpacing: 0.8,
   },
   content: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 21,
     fontWeight: '800',
     lineHeight: 31,
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   emptyChoices: {
     padding: 18,
     borderRadius: 16,
-    color: '#64748B',
+    color: '#66706A',
     backgroundColor: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',

@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   card: {
     gap: 14,
@@ -72,17 +72,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   kicker: {
-    color: '#2563EB',
+    color: '#0B9444',
     fontSize: 12,
     fontWeight: '900',
   },
   title: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 24,
     fontWeight: '900',
   },
   description: {
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 14,
     lineHeight: 20,
   },
@@ -90,15 +90,15 @@ const styles = StyleSheet.create({
     gap: 6,
     padding: 16,
     borderRadius: 16,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F7F9F7',
   },
   infoLabel: {
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 12,
     fontWeight: '800',
   },
   infoValue: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 15,
     fontWeight: '900',
   },

@@ -14,6 +14,7 @@ import { SolveProgressProvider } from '../state/SolveProgressContext';
 import { SubmissionHistoryProvider } from '../state/SubmissionHistoryContext';
 import { StudentDataProvider } from '../state/StudentDataContext';
 import type { RootStackParamList } from '../types/navigation';
+import { brand } from '../theme/brand';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -29,9 +30,9 @@ export function AppNavigator() {
                 screenOptions={({ navigation }) => ({
                   headerTitleAlign: 'center',
                   headerShadowVisible: false,
-                  headerStyle: { backgroundColor: '#FFFFFF' },
-                  headerTintColor: '#17183B',
-                  contentStyle: { backgroundColor: '#F5F6F8' },
+                  headerStyle: { backgroundColor: brand.colors.surface },
+                  headerTintColor: brand.colors.textPrimary,
+                  contentStyle: { backgroundColor: brand.colors.primarySoft },
                   headerLeft: ({ canGoBack }) => (
                     canGoBack ? (
                       <Pressable
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   backButtonText: {
-    color: '#17183B',
+    color: brand.colors.primaryDark,
     fontSize: 15,
     fontWeight: '800',
   },

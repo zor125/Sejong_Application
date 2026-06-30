@@ -35,10 +35,10 @@ const styles = StyleSheet.create({
   card: {
     padding: 22,
     borderRadius: 22,
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#087437',
   },
   label: {
-    color: '#BFDBFE',
+    color: '#BFE8CB',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     marginTop: 4,
-    color: '#BFDBFE',
+    color: '#BFE8CB',
     fontSize: 12,
     fontWeight: '700',
   },

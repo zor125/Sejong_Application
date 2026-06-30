@@ -43,7 +43,7 @@ export function ProfileScreen({ student, cohort, submissions }: ProfileScreenPro
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F3FBF5',
   },
   content: {
     padding: 16,
@@ -64,21 +64,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 29,
-    backgroundColor: '#DBEAFE',
+    backgroundColor: '#E7F6EC',
   },
   avatarText: {
-    color: '#1D4ED8',
+    color: '#087437',
     fontSize: 22,
     fontWeight: '900',
   },
   name: {
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 22,
     fontWeight: '900',
   },
   loginId: {
     marginTop: 4,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -88,19 +88,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   infoLabel: {
-    color: '#2563EB',
+    color: '#0B9444',
     fontSize: 12,
     fontWeight: '900',
   },
   infoTitle: {
     marginTop: 8,
-    color: '#172554',
+    color: '#1A1F1B',
     fontSize: 18,
     fontWeight: '900',
   },
   infoDescription: {
     marginTop: 6,
-    color: '#64748B',
+    color: '#66706A',
     fontSize: 13,
   },
 });

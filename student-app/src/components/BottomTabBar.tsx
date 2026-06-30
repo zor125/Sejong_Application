@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { brand } from '../theme/brand';
 
 import type { MainTab } from '../types/student';
 
@@ -43,8 +44,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 10,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    backgroundColor: '#FFFFFF',
+    borderTopColor: brand.colors.border,
+    backgroundColor: brand.colors.surface,
   },
   item: {
     flex: 1,
@@ -53,16 +54,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   icon: {
-    color: '#9CA3AF',
+    color: '#98A39C',
     fontSize: 22,
     fontWeight: '800',
   },
   label: {
-    color: '#9CA3AF',
+    color: '#98A39C',
     fontSize: 12,
     fontWeight: '700',
   },
   activeText: {
-    color: '#1D4ED8',
+    color: brand.colors.primary,
   },
 });
