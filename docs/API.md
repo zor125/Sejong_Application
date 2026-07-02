@@ -856,8 +856,8 @@ Response:
 | `category` | string \| null | 세부 분류 |
 | `difficulty` | `easy \| medium \| hard` | 난이도 |
 | `type` | `multiple_choice` | 문제 유형 |
-| `content` | string | 문제 본문 |
-| `choices` | Choice[] | 객관식 선지. 각 선지는 `id`, `text`를 가진다. 2개 이상, 최대 5개까지 지원한다. |
+| `content` | string | 문제 본문. 내부 줄바꿈(`\n`)을 보존한다. |
+| `choices` | Choice[] | 객관식 선지. 각 선지는 `id`, `text`를 가진다. 2개 이상, 최대 5개까지 지원하며 선지 text의 내부 줄바꿈(`\n`)을 보존한다. |
 | `correctAnswerIndex` | integer | 정답 선지의 0부터 시작하는 배열 인덱스. 학생 풀이 전 응답에서는 제외한다. |
 | `status` | `draft \| published \| archived` | 콘텐츠 상태 |
 | `createdAt` | ISO 8601 datetime | 생성 일시 |

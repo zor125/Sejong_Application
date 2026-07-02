@@ -1,7 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextStyle, View } from 'react-native';
 
 import type { Choice } from '../types/student';
 import { brand } from '../theme/brand';
+
+const preserveLineBreaksStyle = Platform.OS === 'web' ? ({ whiteSpace: 'pre-wrap' } as TextStyle) : null;
 
 type ChoiceOptionProps = {
   choice: Choice;
@@ -16,7 +18,7 @@ export function ChoiceOption({ choice, index, selected, onPress }: ChoiceOptionP
       <View style={[styles.number, selected && styles.selectedNumber]}>
         <Text style={[styles.numberText, selected && styles.selectedNumberText]}>{index + 1}</Text>
       </View>
-      <Text style={[styles.text, selected && styles.selectedText]}>{choice.text}</Text>
+      <Text style={[styles.text, preserveLineBreaksStyle, selected && styles.selectedText]}>{choice.text}</Text>
       <View style={[styles.radio, selected && styles.selectedRadio]}>
         {selected ? <View style={styles.radioDot} /> : null}
       </View>

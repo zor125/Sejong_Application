@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, TextStyle, View } from 'react-native';
 
 import type { GradedAnswer } from '../types/student';
+
+const preserveLineBreaksStyle = Platform.OS === 'web' ? ({ whiteSpace: 'pre-wrap' } as TextStyle) : null;
 
 type WrongAnswerCardProps = {
   answer: GradedAnswer;
@@ -15,7 +17,7 @@ export function WrongAnswerCard({ answer, index }: WrongAnswerCardProps) {
         <Text style={styles.badge}>틀림</Text>
       </View>
 
-      <Text style={styles.question}>{answer.questionContent}</Text>
+      <Text style={[styles.question, preserveLineBreaksStyle]}>{answer.questionContent}</Text>
 
       <View style={styles.choiceList}>
         {answer.choices.map((choice, choiceIndex) => {
@@ -48,7 +50,7 @@ export function WrongAnswerCard({ answer, index }: WrongAnswerCardProps) {
                 </Text>
               </View>
 
-              <Text style={styles.choiceText}>{choice.text}</Text>
+              <Text style={[styles.choiceText, preserveLineBreaksStyle]}>{choice.text}</Text>
 
               <View style={styles.choiceBadges}>
                 {selected ? <Text style={styles.selectedBadge}>내 답</Text> : null}

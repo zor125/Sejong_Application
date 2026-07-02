@@ -35,6 +35,8 @@ const emptyValues: QuestionFormValues = {
 const MIN_CHOICE_COUNT = 2;
 const MAX_CHOICE_COUNT = 5;
 
+const normalizeMultilineText = (value: string) => value.replace(/\r\n/g, '\n').trim();
+
 export function QuestionForm({ disabled = false, initialValues, mode, onCancel, onSubmit }: QuestionFormProps) {
   const [values, setValues] = useState<QuestionFormValues>(initialValues ?? emptyValues);
 
@@ -84,8 +86,8 @@ export function QuestionForm({ disabled = false, initialValues, mode, onCancel, 
     event.preventDefault();
     onSubmit({
       ...values,
-      content: values.content.trim(),
-      choices: values.choices.map((choice) => choice.trim()),
+      content: normalizeMultilineText(values.content),
+      choices: values.choices.map(normalizeMultilineText),
     });
   };
 
@@ -137,11 +139,12 @@ export function QuestionForm({ disabled = false, initialValues, mode, onCancel, 
         {values.choices.map((choice, index) => (
           <label key={index}>
             <span>보기 {index + 1}</span>
-            <input
+            <textarea
               required
               disabled={disabled}
               value={choice}
               onChange={(event) => handleChoiceChange(index, event.target.value)}
+              rows={2}
             />
             {values.choices.length > MIN_CHOICE_COUNT ? (
               <button
