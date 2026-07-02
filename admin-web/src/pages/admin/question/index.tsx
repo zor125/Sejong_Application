@@ -91,7 +91,9 @@ export function QuestionPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<Set<string>>(new Set());
   const [bulkTargetStatus, setBulkTargetStatus] = useState<ContentStatus>('published');
-  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+  const [bulkCategory, setBulkCategory] = useState('');
+  const [isBulkStatusUpdating, setIsBulkStatusUpdating] = useState(false);
+  const [isBulkCategoryUpdating, setIsBulkCategoryUpdating] = useState(false);
   const [bulkSuccessMessage, setBulkSuccessMessage] = useState('');
   const [isPdfImportOpen, setIsPdfImportOpen] = useState(false);
   const [questionPdfFile, setQuestionPdfFile] = useState<File | null>(null);
@@ -257,7 +259,7 @@ export function QuestionPage() {
 
     if (!confirmed) return;
 
-    setIsBulkUpdating(true);
+    setIsBulkStatusUpdating(true);
     setErrorMessage('');
     setBulkSuccessMessage('');
 
@@ -275,7 +277,41 @@ export function QuestionPage() {
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : '문제 상태를 일괄 변경하지 못했습니다.');
     } finally {
-      setIsBulkUpdating(false);
+      setIsBulkStatusUpdating(false);
+    }
+  };
+
+  const handleBulkUpdateCategory = async () => {
+    const nextCategory = bulkCategory.trim();
+
+    if (selectedQuestionCount === 0 || !nextCategory) return;
+
+    const confirmed = window.confirm(
+      `선택한 ${selectedQuestionCount}개 문제의 카테고리를 "${nextCategory}"으로 변경할까요?`,
+    );
+
+    if (!confirmed) return;
+
+    setIsBulkCategoryUpdating(true);
+    setErrorMessage('');
+    setBulkSuccessMessage('');
+
+    try {
+      const response = await questionApi.bulkUpdateCategory({
+        questionIds: Array.from(selectedQuestionIds),
+        category: nextCategory,
+      });
+
+      setBulkSuccessMessage(
+        `${response.data.updatedCount}개 문제 카테고리가 "${response.data.category}"(으)로 변경되었습니다.`,
+      );
+      setSelectedQuestionIds(new Set());
+      setBulkCategory('');
+      await Promise.all([loadQuestions(currentPage), loadFilterOptions()]);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '문제 카테고리를 일괄 변경하지 못했습니다.');
+    } finally {
+      setIsBulkCategoryUpdating(false);
     }
   };
 
@@ -775,7 +811,7 @@ export function QuestionPage() {
           <label className="search-field">
             <span>변경할 상태</span>
             <select
-              disabled={isBulkUpdating}
+              disabled={selectedQuestionCount === 0 || isBulkStatusUpdating}
               value={bulkTargetStatus}
               onChange={(event) => setBulkTargetStatus(event.target.value as ContentStatus)}
             >
@@ -788,11 +824,32 @@ export function QuestionPage() {
           </label>
           <button
             className="secondary-button"
-            disabled={selectedQuestionCount === 0 || isBulkUpdating}
+            disabled={selectedQuestionCount === 0 || isBulkStatusUpdating}
             type="button"
             onClick={() => void handleBulkUpdateStatus()}
           >
-            {isBulkUpdating ? '상태 변경 중...' : '선택 상태 일괄 변경'}
+            {isBulkStatusUpdating ? '상태 변경 중...' : '선택 상태 일괄 변경'}
+          </button>
+        </div>
+
+        <div className="toolbar">
+          <span className="table-subtitle">선택된 문제 {selectedQuestionCount}개</span>
+          <label className="search-field">
+            <span>변경할 카테고리</span>
+            <input
+              disabled={selectedQuestionCount === 0 || isBulkCategoryUpdating}
+              value={bulkCategory}
+              onChange={(event) => setBulkCategory(event.target.value)}
+              placeholder="예: 기초간호학"
+            />
+          </label>
+          <button
+            className="secondary-button"
+            disabled={selectedQuestionCount === 0 || isBulkCategoryUpdating || !bulkCategory.trim()}
+            type="button"
+            onClick={() => void handleBulkUpdateCategory()}
+          >
+            {isBulkCategoryUpdating ? '카테고리 변경 중...' : '카테고리 일괄 변경'}
           </button>
         </div>
 

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PoolClient } from 'pg';
 import { DatabaseService } from '../../database/database.service';
+import { BulkUpdateQuestionCategoryDto } from './dto/bulk-update-question-category.dto';
 import { BulkUpdateQuestionStatusDto } from './dto/bulk-update-question-status.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { ListQuestionsDto } from './dto/list-questions.dto';
@@ -236,6 +237,103 @@ export class QuestionsService {
 
       await client.query('COMMIT');
       return { data: this.toResponse(question, choices) };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async bulkUpdateQuestionCategory(body: BulkUpdateQuestionCategoryDto) {
+    const uniqueQuestionIds = Array.from(new Set(body.questionIds));
+    const category = body.category.trim();
+
+    if (uniqueQuestionIds.length === 0) {
+      throw new UnprocessableEntityException({
+        error: {
+          code: 'QUESTION_IDS_REQUIRED',
+          message: '카테고리를 변경할 문제를 1개 이상 선택해주세요.',
+          details: [],
+        },
+      });
+    }
+
+    if (uniqueQuestionIds.length !== body.questionIds.length) {
+      throw new UnprocessableEntityException({
+        error: {
+          code: 'DUPLICATE_QUESTION_IDS',
+          message: '중복된 문제 ID가 포함되어 있습니다.',
+          details: [],
+        },
+      });
+    }
+
+    if (!category) {
+      throw new UnprocessableEntityException({
+        error: {
+          code: 'QUESTION_CATEGORY_REQUIRED',
+          message: '카테고리를 입력해주세요.',
+          details: [],
+        },
+      });
+    }
+
+    const client = await this.databaseService.getPool().connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const existingResult = await client.query<{ id: string }>(
+        `SELECT id
+         FROM questions
+         WHERE id = ANY($1::uuid[])
+           AND deleted_at IS NULL
+         FOR UPDATE`,
+        [uniqueQuestionIds],
+      );
+      const existingIds = new Set(existingResult.rows.map((row) => row.id));
+      const missingIds = uniqueQuestionIds.filter((questionId) => !existingIds.has(questionId));
+
+      if (missingIds.length > 0) {
+        throw new UnprocessableEntityException({
+          error: {
+            code: 'QUESTION_BULK_CATEGORY_TARGET_NOT_FOUND',
+            message: '존재하지 않거나 삭제된 문제가 포함되어 있습니다.',
+            details: missingIds,
+          },
+        });
+      }
+
+      const updateResult = await client.query<{ id: string; category: string }>(
+        `UPDATE questions
+         SET category = $2,
+             updated_at = now()
+         WHERE id = ANY($1::uuid[])
+           AND deleted_at IS NULL
+         RETURNING id, category`,
+        [uniqueQuestionIds, category],
+      );
+
+      if (updateResult.rowCount !== uniqueQuestionIds.length) {
+        throw new UnprocessableEntityException({
+          error: {
+            code: 'QUESTION_BULK_CATEGORY_COUNT_MISMATCH',
+            message: '선택한 문제 수와 변경된 문제 수가 일치하지 않습니다.',
+            details: [],
+          },
+        });
+      }
+
+      await client.query('COMMIT');
+
+      return {
+        data: {
+          updatedCount: updateResult.rowCount,
+          category,
+          questionIds: updateResult.rows.map((row) => row.id),
+        },
+      };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
