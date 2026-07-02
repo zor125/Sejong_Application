@@ -1,5 +1,6 @@
 import { CSSProperties, FormEvent, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { AdminFooter } from '../../components/layout/AdminFooter';
 import { adminAccount } from '../../mock/adminAccount';
 import { findAdminId, findAdminPassword, isAdminAuthenticated, loginAdmin } from '../../lib/auth';
 
@@ -11,6 +12,7 @@ const loginPageStyle: CSSProperties = {
   alignItems: 'center',
   background: 'linear-gradient(135deg, #F3FBF5 0%, #FFFFFF 48%, #E7F6EC 100%)',
   display: 'flex',
+  flexDirection: 'column',
   minHeight: '100vh',
   padding: 24,
 };
@@ -123,44 +125,48 @@ export function LoginPage() {
 
   return (
     <div style={loginPageStyle}>
-      <section className="dashboard-panel" style={loginPanelStyle}>
-        <div className="panel-header">
-          <div>
-            <img className="login-brand-logo" src="/sgne-logo.png" alt="세종고운간호전문학원 로고" />
-            <p className="eyebrow">Admin Login</p>
-            <h2>세종고운간호전문학원</h2>
-            <p>강사용 관리 시스템에 로그인하세요.</p>
+      <div className="login-page-content">
+        <section className="dashboard-panel" style={loginPanelStyle}>
+          <div className="panel-header">
+            <div>
+              <img className="login-brand-logo" src="/sgne-logo.png" alt="세종고운간호전문학원 로고" />
+              <p className="eyebrow">Admin Login</p>
+              <h2>세종고운간호전문학원</h2>
+              <p>강사용 관리 시스템에 로그인하세요.</p>
+            </div>
           </div>
-        </div>
 
-        <form className="cohort-form" onSubmit={handleLogin}>
-          <label>
-            <span>ID 또는 Email</span>
-            <input value={id} onChange={(event) => setId(event.target.value)} required />
-          </label>
-          <label>
-            <span>Password</span>
-            <input
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              type="password"
-            />
-          </label>
-          {loginError ? <p style={errorTextStyle}>{loginError}</p> : null}
-          <button className="primary-button" disabled={isLoggingIn} type="submit">
-            {isLoggingIn ? '로그인 중...' : '로그인'}
-          </button>
-          <div className="form-actions">
-            <button className="text-button" type="button" onClick={() => openFindModal('id')}>
-              ID 찾기
+          <form className="cohort-form" onSubmit={handleLogin}>
+            <label>
+              <span>ID 또는 Email</span>
+              <input value={id} onChange={(event) => setId(event.target.value)} required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+                type="password"
+              />
+            </label>
+            {loginError ? <p style={errorTextStyle}>{loginError}</p> : null}
+            <button className="primary-button" disabled={isLoggingIn} type="submit">
+              {isLoggingIn ? '로그인 중...' : '로그인'}
             </button>
-            <button className="text-button" type="button" onClick={() => openFindModal('password')}>
-              비밀번호 찾기
-            </button>
-          </div>
-        </form>
-      </section>
+            <div className="form-actions">
+              <button className="text-button" type="button" onClick={() => openFindModal('id')}>
+                ID 찾기
+              </button>
+              <button className="text-button" type="button" onClick={() => openFindModal('password')}>
+                비밀번호 찾기
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <AdminFooter />
 
       {findMode ? (
         <div aria-modal="true" role="dialog" style={modalBackdropStyle}>
