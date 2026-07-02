@@ -20,6 +20,7 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import { AuthenticatedRequest } from '../../auth/guards/jwt-auth.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { BulkUpdateQuestionCategoryDto } from './dto/bulk-update-question-category.dto';
 import { BulkUpdateQuestionStatusDto } from './dto/bulk-update-question-status.dto';
 import { ConfirmPdfQuestionImportDto } from './dto/confirm-pdf-question-import.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
@@ -79,6 +80,11 @@ export class QuestionsController {
     @Req() request: AuthenticatedRequest,
   ) {
     return this.questionPdfImportService.confirm(body, request.user?.sub);
+  }
+
+  @Patch('bulk/category')
+  bulkUpdateQuestionCategory(@Body() body: BulkUpdateQuestionCategoryDto) {
+    return this.questionsService.bulkUpdateQuestionCategory(body);
   }
 
   @Patch('bulk/status')
