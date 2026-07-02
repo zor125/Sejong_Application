@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, TextStyle, View } from 'react-native';
 
 import type { Question } from '../types/student';
 import { ChoiceOption } from './ChoiceOption';
+
+const preserveLineBreaksStyle = Platform.OS === 'web' ? ({ whiteSpace: 'pre-wrap' } as TextStyle) : null;
 
 type QuestionCardProps = {
   question: Question;
@@ -22,7 +24,7 @@ export function QuestionCard({
     <View style={styles.container}>
       <View style={styles.questionCard}>
         <Text style={styles.number}>QUESTION {questionNumber}</Text>
-        <Text style={styles.content}>{question.content ?? '문항 내용이 없습니다.'}</Text>
+        <Text style={[styles.content, preserveLineBreaksStyle]}>{question.content ?? '문항 내용이 없습니다.'}</Text>
       </View>
 
       <View style={styles.choices}>

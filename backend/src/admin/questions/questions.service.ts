@@ -613,7 +613,7 @@ export class QuestionsService {
   }
 
   private resolveContent(content?: string, stem?: string): string {
-    const resolvedContent = content?.trim() || stem?.trim();
+    const resolvedContent = this.normalizeMultilineText(content) || this.normalizeMultilineText(stem);
 
     if (!resolvedContent) {
       throw new UnprocessableEntityException({
@@ -664,9 +664,13 @@ export class QuestionsService {
     }
   }
 
+  private normalizeMultilineText(value?: string | null): string {
+    return value?.replace(/\r\n/g, '\n').trim() ?? '';
+  }
+
   private resolveChoiceText(choice: QuestionChoiceDto | string): string {
     const text = typeof choice === 'string' ? choice : choice.text;
-    const trimmedText = text?.trim();
+    const trimmedText = this.normalizeMultilineText(text);
 
     if (!trimmedText) {
       throw new UnprocessableEntityException({
