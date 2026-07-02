@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../../lib/auth';
+import { AdminFooter } from './AdminFooter';
 
 const menuItems = [
   { label: 'Dashboard', to: '/admin/dashboard' },
@@ -42,7 +43,10 @@ export function AdminLayout() {
         </button>
       </aside>
       <main>
-        <Outlet />
+        <div className="admin-layout-content">
+          <Outlet />
+        </div>
+        <AdminFooter />
       </main>
     </div>
   );
