@@ -19,6 +19,7 @@ import {
   LoginUserRow,
   StudentApprovalStatus,
   StudentApprovalTokenPayload,
+  StudentOnboardingTokenPayload,
   TeacherAccountRow,
 } from './auth.types';
 
@@ -38,9 +39,9 @@ const INVALID_KAKAO_REDIRECT_URI_RESPONSE = {
   },
 };
 
-const KAKAO_STUDENT_FALLBACK_NAME = '카카오 학생';
 const KAKAO_STUDENT_PROFILE_SCOPES = ['profile_nickname', 'account_email'];
 const DEFAULT_STUDENT_APPROVAL_TOKEN_TTL_SECONDS = 60 * 60 * 24;
+const DEFAULT_STUDENT_ONBOARDING_TOKEN_TTL_SECONDS = 60 * 30;
 
 const normalizeOptionalString = (value: unknown): string | null => {
   if (typeof value !== 'string') return null;
@@ -288,12 +289,35 @@ export class AuthService {
 
     const kakaoAccessToken = await this.exchangeKakaoCode(code, redirectUri);
     const kakaoUser = await this.getKakaoUserInfo(kakaoAccessToken);
-    const student = await this.findOrCreateKakaoStudent(kakaoUser);
+    const student = await this.findKakaoStudent(kakaoUser.providerUserId);
 
-    return this.toStudentAuthStateResponse(student, true);
+    if (student) {
+      const updatedStudent = await this.updateKakaoStudentEmailIfNeeded(student, kakaoUser);
+      return this.toStudentAuthStateResponse(updatedStudent, true);
+    }
+
+    return this.toStudentOnboardingResponse(kakaoUser);
   }
 
 
+
+  async completeKakaoStudentProfile(onboardingToken: string, name: string) {
+    this.assertValidStudentName(name);
+    const payload = await this.verifyStudentOnboardingToken(onboardingToken);
+    const existing = await this.findKakaoStudent(payload.providerUserId);
+
+    if (existing) {
+      return this.toStudentAuthStateResponse(existing, true);
+    }
+
+    const student = await this.createPendingKakaoStudent({
+      providerUserId: payload.providerUserId,
+      email: payload.email ?? null,
+      nickname: null,
+    }, name);
+
+    return this.toStudentAuthStateResponse(student, true);
+  }
 
   async checkStudentApprovalStatus(approvalToken: string) {
     const payload = await this.verifyStudentApprovalToken(approvalToken);
@@ -381,6 +405,54 @@ export class AuthService {
     };
   }
 
+  private assertValidStudentName(name: string): void {
+    if (!name.trim()) {
+      throw new BadRequestException({
+        error: {
+          code: 'STUDENT_NAME_REQUIRED',
+          message: '이름을 입력해주세요.',
+          details: [],
+        },
+      });
+    }
+
+    if (/\p{C}/u.test(name)) {
+      throw new BadRequestException({
+        error: {
+          code: 'INVALID_STUDENT_NAME',
+          message: '이름에 사용할 수 없는 문자가 포함되어 있습니다.',
+          details: [],
+        },
+      });
+    }
+  }
+
+  private async verifyStudentOnboardingToken(onboardingToken: string): Promise<StudentOnboardingTokenPayload> {
+    try {
+      const payload = await this.jwtService.verifyAsync<AccessTokenPayload>(onboardingToken, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      });
+
+      if (
+        payload.role !== 'student' ||
+        payload.tokenUse !== 'student_onboarding' ||
+        !payload.providerUserId
+      ) {
+        throw new Error('Invalid onboarding token payload');
+      }
+
+      return payload as StudentOnboardingTokenPayload;
+    } catch {
+      throw new UnauthorizedException({
+        error: {
+          code: 'INVALID_ONBOARDING_TOKEN',
+          message: '이름 입력 정보가 만료되었습니다. 다시 카카오 로그인해주세요.',
+          details: [],
+        },
+      });
+    }
+  }
+
   private async verifyStudentApprovalToken(approvalToken: string): Promise<StudentApprovalTokenPayload> {
     try {
       const payload = await this.jwtService.verifyAsync<AccessTokenPayload>(approvalToken, {
@@ -406,6 +478,15 @@ export class AuthService {
         },
       });
     }
+  }
+
+  private async toStudentOnboardingResponse(kakaoUser: KakaoUserInfo) {
+    return {
+      data: {
+        status: 'needs_name' as const,
+        onboardingToken: await this.issueStudentOnboardingToken(kakaoUser),
+      },
+    };
   }
 
   private async toStudentAuthStateResponse(student: KakaoStudentRow, includeApprovalToken: boolean) {
@@ -451,6 +532,25 @@ export class AuthService {
         },
       },
     };
+  }
+
+  private async issueStudentOnboardingToken(kakaoUser: KakaoUserInfo): Promise<string> {
+    const configuredTtl = Number(
+      this.configService.get<string>('JWT_STUDENT_ONBOARDING_TOKEN_TTL_SECONDS') ??
+        DEFAULT_STUDENT_ONBOARDING_TOKEN_TTL_SECONDS,
+    );
+    const expiresIn = Number.isInteger(configuredTtl) && configuredTtl > 0
+      ? configuredTtl
+      : DEFAULT_STUDENT_ONBOARDING_TOKEN_TTL_SECONDS;
+    const payload: StudentOnboardingTokenPayload = {
+      sub: kakaoUser.providerUserId,
+      role: 'student',
+      tokenUse: 'student_onboarding',
+      providerUserId: kakaoUser.providerUserId,
+      email: kakaoUser.email,
+    };
+
+    return this.jwtService.signAsync(payload, { expiresIn });
   }
 
   private async issueStudentApprovalToken(student: KakaoStudentRow): Promise<string> {
@@ -543,17 +643,13 @@ export class AuthService {
     };
   }
 
-  private async findOrCreateKakaoStudent(kakaoUser: KakaoUserInfo): Promise<KakaoStudentRow> {
-    const existing = await this.findKakaoStudent(kakaoUser.providerUserId);
-    if (existing) return this.updateKakaoStudentProfileIfNeeded(existing, kakaoUser);
-
+  private async createPendingKakaoStudent(kakaoUser: KakaoUserInfo, name: string): Promise<KakaoStudentRow> {
     const pool = this.databaseService.getPool();
     const client = await pool.connect();
 
     try {
       await client.query('BEGIN');
 
-      const name = kakaoUser.nickname ?? KAKAO_STUDENT_FALLBACK_NAME;
       const loginId = `kakao:${kakaoUser.providerUserId}`;
       const userResult = await client.query<{ id: string }>(
         `INSERT INTO users (
@@ -611,30 +707,25 @@ export class AuthService {
     }
   }
 
-  private async updateKakaoStudentProfileIfNeeded(
+  private async updateKakaoStudentEmailIfNeeded(
     student: KakaoStudentRow,
     kakaoUser: KakaoUserInfo,
   ): Promise<KakaoStudentRow> {
-    const nextName =
-      student.name === KAKAO_STUDENT_FALLBACK_NAME && kakaoUser.nickname
-        ? kakaoUser.nickname
-        : null;
     const nextEmail = !student.email && kakaoUser.email ? kakaoUser.email : null;
 
-    if (!nextName && !nextEmail) {
+    if (!nextEmail) {
       return student;
     }
 
     await this.databaseService.getPool().query(
       `UPDATE users
-       SET name = COALESCE($2, name),
-           email = COALESCE($3, email),
+       SET email = $2,
            updated_at = now()
        WHERE id = $1
          AND role = 'student'
          AND auth_provider = 'kakao'
          AND deleted_at IS NULL`,
-      [student.user_id, nextName, nextEmail],
+      [student.user_id, nextEmail],
     );
 
     return (await this.findKakaoStudent(kakaoUser.providerUserId)) ?? student;

@@ -309,6 +309,19 @@ Request:
 
 Pending / rejected / suspended Response:
 
+신규 카카오 계정 Response:
+
+```json
+{
+  "data": {
+    "status": "needs_name",
+    "onboardingToken": "limited-student-onboarding-token"
+  }
+}
+```
+
+기존 pending 계정 Response:
+
 ```json
 {
   "data": {
@@ -316,7 +329,7 @@ Pending / rejected / suspended Response:
     "approvalToken": "limited-student-approval-token",
     "student": {
       "id": "student-uuid",
-      "name": "카카오 학생",
+      "name": "학생이 입력한 이름",
       "email": "student@example.com",
       "cohortId": null,
       "status": "pending"
@@ -497,6 +510,52 @@ Response:
   "data": {
     "accessToken": "new-jwt-access-token",
     "refreshToken": "new-jwt-refresh-token"
+  }
+}
+```
+
+### 학생 카카오 이름 입력 완료
+
+신규 카카오 학생이 직접 입력한 이름으로 학생 계정을 생성하고 `pending` 승인대기 상태로 전환한다. 카카오 닉네임이나 fallback 이름은 `users.name`에 저장하지 않는다.
+
+| 항목 | 내용 |
+| --- | --- |
+| Method | `POST` |
+| URL | `/api/auth/student/kakao/complete-profile` |
+| StatusCode | `200`, `400`, `401`, `409` |
+
+Request:
+
+```json
+{
+  "onboardingToken": "limited-student-onboarding-token",
+  "name": "학생이 입력한 이름"
+}
+```
+
+정책:
+
+- `onboardingToken`은 `tokenUse: "student_onboarding"` 용도의 제한 토큰이다.
+- 제한 토큰은 이름 입력 완료 API에서만 사용한다.
+- 이름은 앞뒤 공백을 제거하고, 공백만 있는 값은 거부한다.
+- 신규 계정 생성 시 `users.name`에는 학생이 입력한 이름만 저장한다.
+- 같은 카카오 provider id로 이미 계정이 생성된 경우 중복 생성하지 않고 기존 상태 흐름을 반환한다.
+- 응답에는 일반 학생 JWT를 포함하지 않고, pending 학생용 `approvalToken`을 반환한다.
+
+Response:
+
+```json
+{
+  "data": {
+    "status": "pending",
+    "approvalToken": "limited-student-approval-token",
+    "student": {
+      "id": "student-uuid",
+      "name": "학생이 입력한 이름",
+      "email": "student@example.com",
+      "cohortId": null,
+      "status": "pending"
+    }
   }
 }
 ```

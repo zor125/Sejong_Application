@@ -114,7 +114,7 @@ const getLoginErrorMessage = (error: unknown) => {
 };
 
 export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
-  const { approval, completeKakaoLogin, expiredMessage, getKakaoLoginUrl, isAuthenticated, user } = useAuth();
+  const { approval, completeKakaoLogin, expiredMessage, getKakaoLoginUrl, isAuthenticated, onboarding, user } = useAuth();
   const [errorMessage, setErrorMessage] = useState(expiredMessage);
   const [isLoading, setIsLoading] = useState(false);
   const redirectUri = useMemo(getRedirectUri, []);
@@ -148,6 +148,8 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
 
       if ('role' in result) {
         navigation.replace('CohortSelect');
+      } else if (result.status === 'needs_name') {
+        navigation.replace('NameOnboarding');
       } else {
         navigation.replace('ApprovalStatus');
       }
@@ -166,10 +168,15 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
       return;
     }
 
+    if (onboarding) {
+      navigation.replace('NameOnboarding');
+      return;
+    }
+
     if (approval) {
       navigation.replace('ApprovalStatus');
     }
-  }, [approval, isAuthenticated, navigation, user?.cohortId]);
+  }, [approval, isAuthenticated, navigation, onboarding, user?.cohortId]);
 
   useEffect(() => {
     const webLocation = getWebLocation();

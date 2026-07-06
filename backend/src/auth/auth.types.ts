@@ -16,7 +16,9 @@ export type AccessTokenPayload = {
   sub: string;
   role: UserRole;
   profileId?: string;
-  tokenUse?: 'student_approval';
+  tokenUse?: 'student_approval' | 'student_onboarding';
+  providerUserId?: string;
+  email?: string | null;
 };
 
 export type StudentApprovalStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
@@ -25,6 +27,13 @@ export type StudentApprovalTokenPayload = AccessTokenPayload & {
   role: 'student';
   profileId: string;
   tokenUse: 'student_approval';
+};
+
+export type StudentOnboardingTokenPayload = AccessTokenPayload & {
+  role: 'student';
+  tokenUse: 'student_onboarding';
+  providerUserId: string;
+  email: string | null;
 };
 
 export type KakaoUserInfo = {
