@@ -155,7 +155,6 @@ export class QuestionPdfImportService {
         {
           subject: question.subject.trim(),
           category: question.category?.trim() || null,
-          difficulty: question.difficulty ?? DEFAULT_DIFFICULTY,
           type: 'multiple_choice',
           content: question.content.trim(),
           choices: question.choices.map((choice) => choice.trim()),
@@ -221,17 +220,17 @@ export class QuestionPdfImportService {
   private assertConfirmQuestion(question: ConfirmPdfQuestionDraftDto): void {
     const choices = question.choices.map((choice) => choice.trim()).filter(Boolean);
 
-    if (!question.content.trim() || choices.length < 2 || choices.length > 5) {
+    if (!question.content.trim() || choices.length !== 5) {
       throw new UnprocessableEntityException({
         error: {
           code: 'INVALID_PDF_IMPORT_QUESTION',
-          message: '생성할 문제의 본문과 보기 2~5개를 확인해주세요.',
+          message: '생성할 문제의 본문과 보기 5개를 확인해주세요.',
           details: [],
         },
       });
     }
 
-    if (question.correctAnswerIndex < 0 || question.correctAnswerIndex >= choices.length) {
+    if (question.correctAnswerIndex < 0 || question.correctAnswerIndex >= 5) {
       throw new UnprocessableEntityException({
         error: {
           code: 'INVALID_PDF_IMPORT_ANSWER',
@@ -855,12 +854,8 @@ export class QuestionPdfImportService {
       reasons.push('문제 본문이 비정상적으로 짧습니다.');
     }
 
-    if (choices.length < 2) {
-      reasons.push('보기가 2개 미만입니다.');
-    }
-
-    if (choices.length > 5) {
-      reasons.push('보기가 5개를 초과합니다.');
+    if (choices.length !== 5) {
+      reasons.push('보기가 5개가 아닙니다.');
     }
 
     if (!answerNumber) {
@@ -886,8 +881,6 @@ export class QuestionPdfImportService {
     const invalid = reasons.some((reason) =>
       reason.includes('못했습니다') ||
       reason.includes('짧습니다') ||
-      reason.includes('2개 미만') ||
-      reason.includes('5개를 초과') ||
       reason.includes('초과합니다') ||
       reason.includes('깨진 문자'),
     );

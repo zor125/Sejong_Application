@@ -26,8 +26,9 @@ export class CreateQuestionDto {
   @MaxLength(120)
   category?: string | null;
 
+  @IsOptional()
   @IsIn(DIFFICULTIES)
-  difficulty!: QuestionDifficulty;
+  difficulty?: QuestionDifficulty;
 
   @IsOptional()
   @IsIn(QUESTION_TYPES)
@@ -46,7 +47,7 @@ export class CreateQuestionDto {
   stem?: string;
 
   @IsArray()
-  @ArrayMinSize(2)
+  @ArrayMinSize(5)
   @ArrayMaxSize(5)
   choices!: Array<QuestionChoiceDto | string>;
 

@@ -1,12 +1,11 @@
 import { CSSProperties } from 'react';
 import { QuestionStatusLabel } from '../../constants/statusLabels';
-import { ContentStatus, Difficulty, QuestionType } from '../../types/domain';
+import { ContentStatus, QuestionType } from '../../types/domain';
 
 export type QuestionRow = {
   id: string;
   subject: string;
   category?: string;
-  difficulty: Difficulty;
   type: QuestionType;
   content: string;
   choices: string[];
@@ -24,12 +23,6 @@ type QuestionTableProps = {
   onToggleSelectAll?: () => void;
   onDelete: (questionId: string) => void;
   onEdit: (question: QuestionRow) => void;
-};
-
-const difficultyLabels: Record<Difficulty, string> = {
-  easy: '쉬움',
-  medium: '보통',
-  hard: '어려움',
 };
 
 const formatDate = (value: string) =>
@@ -75,7 +68,6 @@ export function QuestionTable({
             <th>문제</th>
             <th>과목</th>
             <th>카테고리</th>
-            <th>난이도</th>
             <th>상태</th>
             <th>정답</th>
             <th>생성일</th>
@@ -100,13 +92,11 @@ export function QuestionTable({
                   {question.content}
                 </div>
                 <span className="table-subtitle">
-                  {question.subject} │ {question.category || '미분류'} │ {difficultyLabels[question.difficulty]} │{' '}
-                  {QuestionStatusLabel[question.status]}
+                  {question.subject} │ {question.category || '미분류'} │ {QuestionStatusLabel[question.status]}
                 </span>
               </td>
               <td>{question.subject}</td>
               <td>{question.category || '-'}</td>
-              <td>{difficultyLabels[question.difficulty]}</td>
               <td>
                 <span className={`status-pill status-${question.status}`}>{QuestionStatusLabel[question.status]}</span>
               </td>
@@ -126,7 +116,7 @@ export function QuestionTable({
           ))}
           {questions.length === 0 ? (
             <tr>
-              <td className="empty-cell" colSpan={10}>
+              <td className="empty-cell" colSpan={9}>
                 검색 결과가 없습니다.
               </td>
             </tr>

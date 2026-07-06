@@ -49,7 +49,7 @@ export class UpdateQuestionDto {
 
   @IsOptional()
   @IsArray()
-  @ArrayMinSize(2)
+  @ArrayMinSize(5)
   @ArrayMaxSize(5)
   choices?: Array<QuestionChoiceDto | string>;
 

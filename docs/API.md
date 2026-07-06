@@ -1113,10 +1113,10 @@ Response:
 | `createdBy` | UUID | 생성한 강사 사용자 ID |
 | `subject` | string | 과목 |
 | `category` | string \| null | 세부 분류 |
-| `difficulty` | `easy \| medium \| hard` | 난이도 |
+| `difficulty` | `easy \| medium \| hard` | 난이도. DB/API 호환을 위해 응답에는 남아 있으나 Admin Web에서는 입력·표시·필터로 사용하지 않는다. 신규 Admin 저장 시 서버 기본값은 `medium`이다. |
 | `type` | `multiple_choice` | 문제 유형 |
 | `content` | string | 문제 본문. 내부 줄바꿈(`\n`)을 보존한다. |
-| `choices` | Choice[] | 객관식 선지. 각 선지는 `id`, `text`를 가진다. 2개 이상, 최대 5개까지 지원하며 선지 text의 내부 줄바꿈(`\n`)을 보존한다. |
+| `choices` | Choice[] | 객관식 선지. 각 선지는 `id`, `text`를 가진다. 기존 조회는 저장된 선지 수를 그대로 반환한다. Admin 신규 생성·수정 저장은 정확히 5개 선지를 요구하며 선지 text의 내부 줄바꿈(`\n`)을 보존한다. |
 | `correctAnswerIndex` | integer | 정답 선지의 0부터 시작하는 배열 인덱스. 학생 풀이 전 응답에서는 제외한다. |
 | `status` | `draft \| published \| archived` | 콘텐츠 상태 |
 | `createdAt` | ISO 8601 datetime | 생성 일시 |
@@ -1133,9 +1133,9 @@ Response:
 Query parameters: `type`, `difficulty`, `subject`, `category`, `status`, `keyword`, `page`, `limit`
 
 - `category`는 앞뒤 공백을 제거한 뒤 `questions.category`와 정확히 일치하는 문제만 조회한다.
-- `keyword`, `status`, `subject`, `difficulty`, `type`, `page`, `limit`과 함께 조합해 사용할 수 있다.
+- `keyword`, `status`, `subject`, `difficulty`, `type`, `page`, `limit`과 함께 조합해 사용할 수 있다. 단, Admin Web 화면에서는 `difficulty` 필터를 제공하지 않는다.
 
-Example: `GET /api/admin/questions?type=multiple_choice&difficulty=medium&subject=기본간호학&category=활력징후&page=1&limit=20`
+Example: `GET /api/admin/questions?type=multiple_choice&subject=기본간호학&category=활력징후&page=1&limit=20`
 
 Response:
 
@@ -1147,12 +1147,14 @@ Response:
       "createdBy": "user-uuid",
       "subject": "기본간호학",
       "category": "활력징후",
-      "difficulty": "medium",
-      "type": "multiple_choice",
+          "type": "multiple_choice",
       "content": "다음 중 활력징후에 해당하는 것은?",
       "choices": [
         { "id": "choice-1", "text": "혈압" },
-        { "id": "choice-2", "text": "키" }
+        { "id": "choice-2", "text": "키" },
+        { "id": "choice-3", "text": "몸무게" },
+        { "id": "choice-4", "text": "시력" },
+        { "id": "choice-5", "text": "청력" }
       ],
       "correctAnswerIndex": 0,
       "status": "published",
@@ -1211,11 +1213,12 @@ Response:
 
 Request:
 
+Admin Web은 난이도를 입력하거나 전송하지 않는다. `choices`는 정확히 5개여야 하며 빈 선지가 있으면 422를 반환한다.
+
 ```json
 {
   "subject": "기본간호학",
   "category": "활력징후",
-  "difficulty": "medium",
   "type": "multiple_choice",
   "content": "다음 중 활력징후에 해당하는 것은?",
   "choices": [
@@ -1239,8 +1242,7 @@ Response:
     "createdBy": "user-uuid",
     "subject": "기본간호학",
     "category": "활력징후",
-    "difficulty": "medium",
-    "type": "multiple_choice",
+      "type": "multiple_choice",
     "content": "다음 중 활력징후에 해당하는 것은?",
     "choices": [
       { "id": "choice-1", "text": "혈압" },
@@ -1276,8 +1278,7 @@ Response:
     "createdBy": "user-uuid",
     "subject": "기본간호학",
     "category": "활력징후",
-    "difficulty": "medium",
-    "type": "multiple_choice",
+      "type": "multiple_choice",
     "content": "다음 중 활력징후에 해당하는 것은?",
     "choices": [
       { "id": "choice-1", "text": "혈압" }
@@ -1300,10 +1301,11 @@ Response:
 
 Request:
 
+`choices`를 함께 수정하는 경우 정확히 5개를 보내야 한다. 기존 4지선다 문제는 조회 가능하지만, Admin Web 수정 저장 시 보기 5를 입력해야 저장할 수 있다.
+
 ```json
 {
   "content": "다음 중 활력징후에 포함되는 것은?",
-  "difficulty": "hard",
   "choices": [
     { "text": "혈압" },
     { "text": "키" },
@@ -1322,8 +1324,7 @@ Response:
   "data": {
     "id": "question-uuid",
     "content": "다음 중 활력징후에 포함되는 것은?",
-    "difficulty": "hard",
-    "correctAnswerIndex": 0,
+      "correctAnswerIndex": 0,
     "updatedAt": "2026-06-18T10:00:00+09:00"
   }
 }
@@ -1491,8 +1492,8 @@ Response:
 
 미리보기 상태:
 
-- `ready`: 본문, 보기 2~5개, 정답 1~5번 매칭이 완료된 문항
-- `needs_review`: 그림·도표·자료형 문항 등 자동 추출은 됐지만 강사 검토가 필요한 문항
+- `ready`: 본문, 보기 5개, 정답 1~5번 매칭이 완료된 문항
+- `needs_review`: 그림·도표·자료형 문항 또는 보기 개수가 5개가 아니어서 강사 검토·수정이 필요한 문항
 - `invalid`: 본문, 보기, 정답이 누락되었거나 정답 번호가 보기 범위를 벗어난 문항. 깨진 문자(`�`, `□` 등) 또는 비정상적으로 짧은 본문도 `ready`가 될 수 없다.
 
 문항/정답 파싱 규칙:
@@ -1533,8 +1534,7 @@ Request:
       "questionNumber": 1,
       "subject": "기초간호학개요",
       "category": null,
-      "difficulty": "medium",
-      "content": "다음 중 활력징후에 해당하는 것은?",
+          "content": "다음 중 활력징후에 해당하는 것은?",
       "choices": ["혈압", "키", "몸무게", "시력", "청력"],
       "correctAnswerIndex": 0
     }
@@ -1553,8 +1553,7 @@ Response:
         "id": "question-uuid",
         "subject": "기본간호학",
         "category": null,
-        "difficulty": "medium",
-        "type": "multiple_choice",
+              "type": "multiple_choice",
         "content": "다음 중 활력징후에 해당하는 것은?",
         "choices": [
           { "id": "choice-1", "text": "혈압" },
