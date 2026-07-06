@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { KakaoAuthorizeQueryDto, KakaoCallbackDto } from './dto/kakao-login.dto';
 import { StudentApprovalStatusDto } from './dto/student-approval-status.dto';
+import { StudentCompleteProfileDto } from './dto/student-complete-profile.dto';
 import { ChangeTeacherPasswordDto, UpdateTeacherAccountDto } from './dto/account-settings.dto';
 import { Roles } from './decorators/roles.decorator';
 import { AuthenticatedRequest, JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -66,5 +67,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   checkStudentApprovalStatus(@Body() body: StudentApprovalStatusDto) {
     return this.authService.checkStudentApprovalStatus(body.approvalToken);
+  }
+
+  @Post('student/kakao/complete-profile')
+  @HttpCode(HttpStatus.OK)
+  completeKakaoStudentProfile(@Body() body: StudentCompleteProfileDto) {
+    return this.authService.completeKakaoStudentProfile(body.onboardingToken, body.name);
   }
 }

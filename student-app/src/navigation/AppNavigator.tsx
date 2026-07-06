@@ -6,6 +6,7 @@ import { CohortSelectScreen } from '../screens/CohortSelectScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { ApprovalStatusScreen } from '../screens/ApprovalStatusScreen';
 import { MainScreen } from '../screens/MainScreen';
+import { NameOnboardingScreen } from '../screens/NameOnboardingScreen';
 import { ResultScreen } from '../screens/ResultScreen';
 import { WorkbookDetailScreen } from '../screens/WorkbookDetailScreen';
 import { WorkbookSolveScreen } from '../screens/WorkbookSolveScreen';
@@ -53,6 +54,11 @@ export function AppNavigator() {
                   name="ApprovalStatus"
                   component={ApprovalStatusScreen}
                   options={{ title: '가입 승인 상태', headerBackVisible: false }}
+                />
+                <Stack.Screen
+                  name="NameOnboarding"
+                  component={NameOnboardingScreen}
+                  options={{ title: '이름 입력', headerBackVisible: false }}
                 />
                 <Stack.Screen
                   name="CohortSelect"

@@ -41,7 +41,7 @@ export class JwtAuthGuard implements CanActivate {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
-      if (request.user.tokenUse === 'student_approval') {
+      if (request.user.tokenUse) {
         throw new UnauthorizedException({
           error: {
             code: 'INVALID_TOKEN',
