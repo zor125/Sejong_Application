@@ -5,7 +5,7 @@ import { Pagination } from '../../../components/admin/Pagination';
 import { WorkbookForm, WorkbookFormValues } from '../../../components/admin/WorkbookForm';
 import { WorkbookTable, WorkbookTableRow } from '../../../components/admin/WorkbookTable';
 import { QuestionStatusLabel, WorkbookStatusLabel, WorkbookStatusOptions } from '../../../constants/statusLabels';
-import { ContentStatus, Difficulty } from '../../../types/domain';
+import { ContentStatus } from '../../../types/domain';
 
 const WORKBOOK_PAGE_SIZE = 5;
 const QUESTION_LIMIT = 100;
@@ -15,7 +15,6 @@ type QuestionRow = {
   id: string;
   subject: string;
   category?: string;
-  difficulty: Difficulty;
   type: 'multiple_choice';
   content: string;
   choices: string[];
@@ -31,12 +30,6 @@ type WorkbookQuestionRow = {
   sequence: number;
   points: number;
   questionContent?: string;
-};
-
-const difficultyLabels: Record<Difficulty, string> = {
-  easy: '쉬움',
-  medium: '보통',
-  hard: '어려움',
 };
 
 const modalBackdropStyle: CSSProperties = {
@@ -74,7 +67,6 @@ const toQuestionRow = (question: QuestionApiItem): QuestionRow => ({
   id: question.id,
   subject: question.subject,
   category: question.category ?? undefined,
-  difficulty: question.difficulty,
   type: 'multiple_choice',
   content: question.content,
   choices: question.choices.map((choice) => choice.text),
@@ -598,8 +590,7 @@ export function WorkbookPage() {
                   <div>
                     <div style={questionContentStyle}>{getQuestionPreview(question.content)}</div>
                     <span className="question-meta">
-                      {question.subject} | {question.category ?? '미분류'} | {difficultyLabels[question.difficulty]} |{' '}
-                      {QuestionStatusLabel[question.status]}
+                      {question.subject} | {question.category ?? '미분류'} | {QuestionStatusLabel[question.status]}
                     </span>
                   </div>
                   <button
@@ -689,7 +680,7 @@ export function WorkbookPage() {
                       <div style={questionContentStyle}>{getQuestionPreview(resolveQuestionContent(item))}</div>
                       <span className="question-meta">
                         {question
-                          ? `${question.subject} · ${question.category ?? '미분류'} · ${difficultyLabels[question.difficulty]}`
+                          ? `${question.subject} · ${question.category ?? '미분류'}`
                           : '상세 문제 정보는 문제은행 조회 후 표시됩니다.'}
                       </span>
                       <p>정답 보기 {question ? question.correctAnswerIndex + 1 : '-'}</p>

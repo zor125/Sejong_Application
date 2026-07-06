@@ -9,7 +9,7 @@ import { Pagination } from '../../../components/admin/Pagination';
 import { QuestionForm, QuestionFormValues } from '../../../components/admin/QuestionForm';
 import { QuestionRow, QuestionTable } from '../../../components/admin/QuestionTable';
 import { QuestionStatusOptions } from '../../../constants/statusLabels';
-import { ContentStatus, Difficulty } from '../../../types/domain';
+import { ContentStatus } from '../../../types/domain';
 
 const PAGE_SIZE = 6;
 
@@ -19,7 +19,6 @@ type QuestionFilterOption = {
 };
 
 type QuestionFilter = 'all' | string;
-type DifficultyFilter = 'all' | Difficulty;
 type StatusFilter = 'all' | ContentStatus;
 
 type EditablePdfImportQuestion = PdfQuestionImportPreviewItem & {
@@ -33,12 +32,15 @@ const importStatusLabels: Record<EditablePdfImportQuestion['status'], string> = 
 };
 
 const DEFAULT_IMPORT_SUBJECT = 'PDF 가져오기';
+const FIXED_CHOICE_COUNT = 5;
+
+const normalizeFixedChoices = (choices: string[]) =>
+  Array.from({ length: FIXED_CHOICE_COUNT }, (_, index) => choices[index] ?? '');
 
 const toRow = (question: QuestionApiItem): QuestionRow => ({
   id: question.id,
   subject: question.subject,
   category: question.category ?? undefined,
-  difficulty: question.difficulty,
   type: 'multiple_choice',
   content: question.content,
   choices: question.choices.map((choice) => choice.text),
@@ -52,7 +54,6 @@ const toRow = (question: QuestionApiItem): QuestionRow => ({
 const toFormValues = (question: QuestionRow): QuestionFormValues => ({
   subject: question.subject,
   category: question.category ?? '',
-  difficulty: question.difficulty,
   type: question.type,
   content: question.content,
   choices: question.choices,
@@ -63,10 +64,9 @@ const toFormValues = (question: QuestionRow): QuestionFormValues => ({
 const toPayload = (values: QuestionFormValues): QuestionPayload => ({
   subject: values.subject.trim(),
   category: values.category.trim() || null,
-  difficulty: values.difficulty,
   type: 'multiple_choice',
   content: values.content.trim(),
-  choices: values.choices.map((choice) => choice.trim()),
+  choices: normalizeFixedChoices(values.choices).map((choice) => choice.trim()),
   correctAnswerIndex: values.correctAnswerIndex,
   status: values.status,
 });
@@ -80,7 +80,6 @@ export function QuestionPage() {
   const [keyword, setKeyword] = useState('');
   const [subject, setSubject] = useState<QuestionFilter>('all');
   const [category, setCategory] = useState<QuestionFilter>('all');
-  const [difficulty, setDifficulty] = useState<DifficultyFilter>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [page, setPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
@@ -113,11 +112,10 @@ export function QuestionPage() {
       question.included &&
       question.status !== 'invalid' &&
       question.content.trim() &&
-      question.choices.filter((choice) => choice.trim()).length >= 2 &&
-      question.choices.filter((choice) => choice.trim()).length <= 5 &&
+      normalizeFixedChoices(question.choices).filter((choice) => choice.trim()).length === FIXED_CHOICE_COUNT &&
       question.correctAnswerIndex !== null &&
       question.correctAnswerIndex >= 0 &&
-      question.correctAnswerIndex < question.choices.filter((choice) => choice.trim()).length,
+      question.correctAnswerIndex < FIXED_CHOICE_COUNT,
   );
 
   const subjects = useMemo(
@@ -157,7 +155,6 @@ export function QuestionPage() {
         keyword,
         subject: subject === 'all' ? undefined : subject,
         category: category === 'all' ? undefined : category,
-        difficulty: difficulty === 'all' ? undefined : difficulty,
         status: status === 'all' ? undefined : status,
         type: 'multiple_choice',
       });
@@ -173,7 +170,7 @@ export function QuestionPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [category, difficulty, keyword, page, status, subject]);
+  }, [category, keyword, page, status, subject]);
 
   useEffect(() => {
     loadFilterOptions().catch((error) => {
@@ -205,11 +202,6 @@ export function QuestionPage() {
     setPage(1);
   };
 
-  const handleDifficultyChange = (value: DifficultyFilter) => {
-    setDifficulty(value);
-    setPage(1);
-  };
-
   const handleStatusChange = (value: StatusFilter) => {
     setStatus(value);
     setPage(1);
@@ -219,7 +211,6 @@ export function QuestionPage() {
     setKeyword('');
     setSubject('all');
     setCategory('all');
-    setDifficulty('all');
     setStatus('all');
     setPage(1);
     setSelectedQuestionIds(new Set());
@@ -342,7 +333,8 @@ export function QuestionPage() {
           included: item.status === 'ready',
           subject: item.subject || DEFAULT_IMPORT_SUBJECT,
           category: item.category ?? '',
-          correctAnswerIndex: item.correctAnswerIndex ?? 0,
+          choices: normalizeFixedChoices(item.choices),
+          correctAnswerIndex: Math.min(item.correctAnswerIndex ?? 0, FIXED_CHOICE_COUNT - 1),
         })),
       );
       setPermissionConfirmed(false);
@@ -366,42 +358,8 @@ export function QuestionPage() {
   const updateImportChoice = (questionIndex: number, choiceIndex: number, value: string) => {
     updateImportQuestion(questionIndex, (question) => ({
       ...question,
-      choices: question.choices.map((choice, index) => (index === choiceIndex ? value : choice)),
+      choices: normalizeFixedChoices(question.choices).map((choice, index) => (index === choiceIndex ? value : choice)),
     }));
-  };
-
-  const addImportChoice = (questionIndex: number) => {
-    updateImportQuestion(questionIndex, (question) => {
-      if (question.choices.length >= 5) return question;
-
-      return {
-        ...question,
-        choices: [...question.choices, ''],
-      };
-    });
-  };
-
-  const removeImportChoice = (questionIndex: number, choiceIndex: number) => {
-    updateImportQuestion(questionIndex, (question) => {
-      if (question.choices.length <= 2) return question;
-
-      const nextChoices = question.choices.filter((_, index) => index !== choiceIndex);
-      const nextCorrectAnswerIndex =
-        question.correctAnswerIndex === choiceIndex
-          ? 0
-          : question.correctAnswerIndex !== null && question.correctAnswerIndex > choiceIndex
-            ? question.correctAnswerIndex - 1
-            : question.correctAnswerIndex;
-
-      return {
-        ...question,
-        choices: nextChoices,
-        correctAnswerIndex:
-          nextCorrectAnswerIndex === null
-            ? 0
-            : Math.min(nextCorrectAnswerIndex, nextChoices.length - 1),
-      };
-    });
   };
 
   const handleCreatePdfDrafts = async () => {
@@ -426,9 +384,8 @@ export function QuestionPage() {
           questionNumber: question.questionNumber,
           subject: question.subject.trim() || DEFAULT_IMPORT_SUBJECT,
           category: question.category?.trim() || null,
-          difficulty: 'medium',
           content: question.content.trim(),
-          choices: question.choices.map((choice) => choice.trim()).filter(Boolean),
+          choices: normalizeFixedChoices(question.choices).map((choice) => choice.trim()),
           correctAnswerIndex: question.correctAnswerIndex ?? 0,
         })),
       );
@@ -657,7 +614,7 @@ export function QuestionPage() {
                         </label>
 
                         <div className="form-grid">
-                          {question.choices.map((choice, choiceIndex) => (
+                          {normalizeFixedChoices(question.choices).map((choice, choiceIndex) => (
                             <label key={choiceIndex}>
                               <span>보기 {choiceIndex + 1}</span>
                               <input
@@ -666,28 +623,11 @@ export function QuestionPage() {
                                   updateImportChoice(questionIndex, choiceIndex, event.target.value)
                                 }
                               />
-                              {question.choices.length > 2 ? (
-                                <button
-                                  className="text-button"
-                                  type="button"
-                                  onClick={() => removeImportChoice(questionIndex, choiceIndex)}
-                                >
-                                  보기 삭제
-                                </button>
-                              ) : null}
                             </label>
                           ))}
                         </div>
 
                         <div className="form-actions">
-                          <button
-                            className="secondary-button"
-                            disabled={question.choices.length >= 5}
-                            type="button"
-                            onClick={() => addImportChoice(questionIndex)}
-                          >
-                            보기 추가
-                          </button>
                           <label className="search-field">
                             <span>정답</span>
                             <select
@@ -699,7 +639,7 @@ export function QuestionPage() {
                                 }))
                               }
                             >
-                              {question.choices.map((choice, index) => (
+                              {normalizeFixedChoices(question.choices).map((choice, index) => (
                                 <option key={index} value={index}>
                                   보기 {index + 1}
                                   {choice ? ` - ${choice}` : ''}
@@ -768,18 +708,6 @@ export function QuestionPage() {
                   {item}
                 </option>
               ))}
-            </select>
-          </label>
-          <label className="search-field">
-            <span>난이도</span>
-            <select
-              value={difficulty}
-              onChange={(event) => handleDifficultyChange(event.target.value as DifficultyFilter)}
-            >
-              <option value="all">전체 난이도</option>
-              <option value="easy">쉬움</option>
-              <option value="medium">보통</option>
-              <option value="hard">어려움</option>
             </select>
           </label>
           <label className="search-field">

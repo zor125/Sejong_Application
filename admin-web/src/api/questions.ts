@@ -1,5 +1,5 @@
 import { apiRequest } from '.';
-import { ContentStatus, Difficulty, QuestionType } from '../types/domain';
+import { ContentStatus, QuestionType } from '../types/domain';
 
 export type QuestionChoiceApiItem = {
   id: string;
@@ -11,7 +11,6 @@ export type QuestionApiItem = {
   createdBy: string;
   subject: string;
   category: string | null;
-  difficulty: Difficulty;
   type: QuestionType;
   content: string;
   choices: QuestionChoiceApiItem[];
@@ -28,7 +27,6 @@ export type ListQuestionsParams = {
   keyword?: string;
   subject?: string;
   category?: string;
-  difficulty?: Difficulty;
   status?: ContentStatus;
   type?: QuestionType;
 };
@@ -36,7 +34,6 @@ export type ListQuestionsParams = {
 export type QuestionPayload = {
   subject: string;
   category?: string | null;
-  difficulty: Difficulty;
   type: QuestionType;
   content: string;
   choices: string[];
@@ -62,7 +59,6 @@ export type PdfQuestionImportConfirmItem = {
   questionNumber?: number;
   subject: string;
   category?: string | null;
-  difficulty?: Difficulty;
   content: string;
   choices: string[];
   correctAnswerIndex: number;
@@ -146,10 +142,6 @@ const toQueryString = (params: ListQuestionsParams) => {
 
   if (params.category?.trim()) {
     searchParams.set('category', params.category.trim());
-  }
-
-  if (params.difficulty) {
-    searchParams.set('difficulty', params.difficulty);
   }
 
   if (params.status) {

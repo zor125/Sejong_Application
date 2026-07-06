@@ -40,7 +40,7 @@ export class ConfirmPdfQuestionDraftDto {
   content!: string;
 
   @IsArray()
-  @ArrayMinSize(2)
+  @ArrayMinSize(5)
   @ArrayMaxSize(5)
   choices!: string[];
 

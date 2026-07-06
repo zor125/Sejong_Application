@@ -20,6 +20,9 @@ import {
   QuestionType,
 } from './question.types';
 
+const FIXED_CHOICE_COUNT = 5;
+const DEFAULT_DIFFICULTY = 'medium' as const;
+
 @Injectable()
 export class QuestionsService {
   constructor(private readonly databaseService: DatabaseService) {}
@@ -140,7 +143,8 @@ export class QuestionsService {
     const content = this.resolveContent(body.content, body.stem);
     const questionType = this.resolveQuestionType(body.type, body.questionType);
     const answerIndex = this.resolveAnswerIndex(body.correctAnswerIndex, body.answerKey);
-    this.assertAnswerIndex(answerIndex, body.choices.length);
+    this.assertExactChoiceCount(body.choices.length);
+    this.assertAnswerIndex(answerIndex, FIXED_CHOICE_COUNT);
 
     const client = await this.databaseService.getPool().connect();
 
@@ -175,7 +179,7 @@ export class QuestionsService {
           createdBy,
           body.subject,
           body.category ?? null,
-          body.difficulty,
+          body.difficulty ?? DEFAULT_DIFFICULTY,
           questionType,
           content,
           answerIndex,
@@ -202,7 +206,12 @@ export class QuestionsService {
     const nextAnswerIndex =
       body.correctAnswerIndex ?? body.answerKey ?? current.correct_answer_index;
 
-    this.assertAnswerIndex(nextAnswerIndex, nextChoiceCount);
+    if (body.choices) {
+      this.assertExactChoiceCount(body.choices.length);
+      this.assertAnswerIndex(nextAnswerIndex, FIXED_CHOICE_COUNT);
+    } else {
+      this.assertAnswerIndex(nextAnswerIndex, nextChoiceCount);
+    }
 
     const client = await this.databaseService.getPool().connect();
 
@@ -658,6 +667,18 @@ export class QuestionsService {
         error: {
           code: 'INVALID_ANSWER_KEY',
           message: '정답 인덱스가 보기 범위를 벗어났습니다.',
+          details: [],
+        },
+      });
+    }
+  }
+
+  private assertExactChoiceCount(choiceCount: number): void {
+    if (choiceCount !== FIXED_CHOICE_COUNT) {
+      throw new UnprocessableEntityException({
+        error: {
+          code: 'INVALID_CHOICE_COUNT',
+          message: '선택지는 정확히 5개를 입력해야 합니다.',
           details: [],
         },
       });
