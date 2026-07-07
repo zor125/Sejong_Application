@@ -7,6 +7,7 @@ export type SubmissionAnswerApiItem = {
   questionId: string;
   sequence: number;
   questionContent: string;
+  explanation: string | null;
   type: 'multiple_choice';
   subject: string;
   category: string | null;

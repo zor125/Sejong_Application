@@ -78,6 +78,7 @@ export type SubmissionAnswerRow = {
   question_id: string;
   sequence: number;
   question_content: string;
+  explanation: string | null;
   question_type: 'multiple_choice';
   subject: string;
   category: string | null;
