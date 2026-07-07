@@ -110,6 +110,7 @@ export function ScorePage() {
   const averageCorrectRate = average(submittedScores.map((score) => score.correctRate));
   const selectedWorkbook = workbooks.find((workbook) => workbook.id === workbookId);
   const hasSelectedWorkbook = workbookId !== 'all';
+  const wrongAnswers = selectedSubmission?.answers.filter((answer) => !answer.isCorrect) ?? [];
 
   const statCards = [
     {
@@ -394,7 +395,7 @@ export function ScorePage() {
           <section className="dashboard-panel" style={modalPanelStyle}>
             <div className="panel-header">
               <div>
-                <h2>제출 상세</h2>
+                <h2>제출 오답</h2>
                 <p>
                   {selectedSubmission.studentName} · {selectedSubmission.cohortName} ·{' '}
                   {selectedSubmission.workbookTitle}
@@ -406,6 +407,16 @@ export function ScorePage() {
             </div>
 
             <div className="stat-grid">
+              <article className="stat-card">
+                <span>학생</span>
+                <strong>{selectedSubmission.studentName}</strong>
+                <p>{selectedSubmission.studentNo ?? selectedSubmission.cohortName}</p>
+              </article>
+              <article className="stat-card">
+                <span>문제집</span>
+                <strong>{selectedSubmission.workbookTitle}</strong>
+                <p>{selectedSubmission.cohortName}</p>
+              </article>
               <article className="stat-card">
                 <span>점수</span>
                 <strong>
@@ -429,36 +440,32 @@ export function ScorePage() {
               <table>
                 <thead>
                   <tr>
-                    <th>문제</th>
-                    <th>선택 답안</th>
+                    <th>문제 번호</th>
+                    <th>문제 내용</th>
+                    <th>학생 선택 답</th>
                     <th>정답</th>
-                    <th>결과</th>
-                    <th>획득점수</th>
+                    <th>해설</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedSubmission.answers.map((answer) => (
+                  {wrongAnswers.map((answer) => (
                     <tr key={answer.id}>
+                      <td>{answer.sequence}번</td>
                       <td>
                         <div className="table-title">{answer.questionContent}</div>
                         <span className="table-subtitle">
-                          {answer.sequence}번 · {answer.subject} · {answer.category ?? '미분류'}
+                          {answer.subject} · {answer.category ?? '미분류'}
                         </span>
                       </td>
                       <td>{answer.selectedChoiceText ?? '미선택'}</td>
                       <td>{answer.correctChoiceText ?? '-'}</td>
-                      <td>
-                        <span className={`status-pill ${answer.isCorrect ? 'status-open' : 'status-cancelled'}`}>
-                          {answer.isCorrect ? '정답' : '오답'}
-                        </span>
-                      </td>
-                      <td>{answer.earnedPoints.toLocaleString('ko-KR')}점</td>
+                      <td>{answer.explanation?.trim() || '-'}</td>
                     </tr>
                   ))}
-                  {selectedSubmission.answers.length === 0 ? (
+                  {wrongAnswers.length === 0 ? (
                     <tr>
                       <td className="empty-cell" colSpan={5}>
-                        답안 데이터가 없습니다.
+                        틀린 문제가 없습니다.
                       </td>
                     </tr>
                   ) : null}

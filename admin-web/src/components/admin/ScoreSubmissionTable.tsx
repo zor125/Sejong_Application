@@ -50,7 +50,7 @@ export function ScoreSubmissionTable({ submissions, onViewDetail }: ScoreSubmiss
             <th>정답/오답</th>
             <th>상태</th>
             <th>제출일</th>
-            <th>상세</th>
+            <th>오답 보기</th>
           </tr>
         </thead>
         <tbody>
@@ -76,7 +76,7 @@ export function ScoreSubmissionTable({ submissions, onViewDetail }: ScoreSubmiss
               <td>{formatDate(submission.submittedAt)}</td>
               <td>
                 <button className="text-button" type="button" onClick={() => onViewDetail(submission.id)}>
-                  상세
+                  오답 보기
                 </button>
               </td>
             </tr>
