@@ -70,14 +70,21 @@ const questionTextPreviewStyle: CSSProperties = {
   whiteSpace: 'normal',
 };
 
+const wrongAnswerQuestionTextStyle: CSSProperties = {
+  overflowWrap: 'anywhere',
+  whiteSpace: 'normal',
+  wordBreak: 'keep-all',
+};
+
 const wrongAnswerTableWrapStyle: CSSProperties = {
   maxHeight: 'min(46vh, 480px)',
   overflow: 'auto',
 };
 
 const wrongAnswerTableStyle: CSSProperties = {
-  minWidth: 900,
+  minWidth: 960,
   tableLayout: 'fixed',
+  width: '100%',
 };
 
 const wrongAnswerHeaderCellStyle: CSSProperties = {
@@ -91,21 +98,20 @@ const wrongAnswerCellStyle: CSSProperties = {
 
 const questionNumberCellStyle: CSSProperties = {
   ...wrongAnswerCellStyle,
-  width: 74,
+  width: '8%',
 };
 
 const questionContentCellStyle: CSSProperties = {
   ...wrongAnswerCellStyle,
-  maxWidth: 360,
   whiteSpace: 'normal',
-  width: '38%',
+  width: '54%',
 };
 
 const answerCellStyle: CSSProperties = {
   ...wrongAnswerCellStyle,
-  minWidth: 220,
+  minWidth: 170,
   whiteSpace: 'normal',
-  width: '26%',
+  width: '19%',
 };
 
 const wrongAnswerTextStyle: CSSProperties = {
@@ -564,10 +570,10 @@ export function ScorePage() {
               <div className="table-wrap" style={wrongAnswerTableWrapStyle}>
                 <table style={wrongAnswerTableStyle}>
                   <colgroup>
-                    <col style={{ width: 74 }} />
-                    <col style={{ width: '38%' }} />
-                    <col style={{ width: '31%' }} />
-                    <col style={{ width: '31%' }} />
+                    <col style={{ width: '8%' }} />
+                    <col style={{ width: '54%' }} />
+                    <col style={{ width: '19%' }} />
+                    <col style={{ width: '19%' }} />
                   </colgroup>
                   <thead>
                     <tr>
@@ -582,7 +588,7 @@ export function ScorePage() {
                       <tr key={answer.id}>
                         <td style={questionNumberCellStyle}>{answer.sequence}번</td>
                         <td style={questionContentCellStyle}>
-                          <div className="table-title" style={questionTextPreviewStyle}>
+                          <div className="table-title" style={wrongAnswerQuestionTextStyle}>
                             {answer.questionContent}
                           </div>
                           <span className="table-subtitle">
