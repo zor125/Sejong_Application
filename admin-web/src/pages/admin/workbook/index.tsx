@@ -176,16 +176,20 @@ export function WorkbookPage() {
       return a.id.localeCompare(b.id);
     });
   }, [questionSortOrder, questions]);
-  const visibleSelectedCandidateQuestions = useMemo(
+  const selectableCandidateQuestions = useMemo(
     () =>
       sortedQuestionCandidates.filter(
-        (question) =>
-          selectedCandidateQuestionIdSet.has(question.id) &&
-          !selectedQuestionIds.has(question.id) &&
-          question.status === QUESTION_CANDIDATE_STATUS,
+        (question) => !selectedQuestionIds.has(question.id) && question.status === QUESTION_CANDIDATE_STATUS,
       ),
-    [selectedCandidateQuestionIdSet, selectedQuestionIds, sortedQuestionCandidates],
+    [selectedQuestionIds, sortedQuestionCandidates],
   );
+  const visibleSelectedCandidateQuestions = useMemo(
+    () => selectableCandidateQuestions.filter((question) => selectedCandidateQuestionIdSet.has(question.id)),
+    [selectableCandidateQuestions, selectedCandidateQuestionIdSet],
+  );
+  const areAllSelectableCandidateQuestionsSelected =
+    selectableCandidateQuestions.length > 0 &&
+    selectableCandidateQuestions.every((question) => selectedCandidateQuestionIdSet.has(question.id));
   const questionById = useMemo(() => new Map(questions.map((question) => [question.id, question])), [questions]);
   const selectedTotalScore = selectedItems.reduce((sum, item) => sum + item.points, 0);
   const hasSelectedQuestions = selectedItems.length > 0;
@@ -403,6 +407,22 @@ export function WorkbookPage() {
         ? current.filter((questionId) => questionId !== question.id)
         : [...current, question.id],
     );
+  };
+
+  const toggleAllCandidateQuestions = () => {
+    if (!selectedWorkbook || selectableCandidateQuestions.length === 0) return;
+
+    setSelectedCandidateQuestionIds((current) => {
+      const selectableIds = new Set(selectableCandidateQuestions.map((question) => question.id));
+
+      if (areAllSelectableCandidateQuestionsSelected) {
+        return current.filter((questionId) => !selectableIds.has(questionId));
+      }
+
+      const nextIds = new Set(current);
+      selectableCandidateQuestions.forEach((question) => nextIds.add(question.id));
+      return Array.from(nextIds);
+    });
   };
 
   const addSelectedCandidateQuestions = () => {
@@ -659,14 +679,24 @@ export function WorkbookPage() {
 
           <div className="bulk-add-toolbar">
             <span className="table-subtitle">선택된 후보 문제 {visibleSelectedCandidateQuestions.length}개</span>
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={addSelectedCandidateQuestions}
-              disabled={!selectedWorkbook || visibleSelectedCandidateQuestions.length === 0}
-            >
-              선택 문제 일괄 추가
-            </button>
+            <div className="bulk-add-actions">
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={toggleAllCandidateQuestions}
+                disabled={!selectedWorkbook || selectableCandidateQuestions.length === 0}
+              >
+                {areAllSelectableCandidateQuestionsSelected ? '선택 해제' : '현재 목록 전체 선택'}
+              </button>
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={addSelectedCandidateQuestions}
+                disabled={!selectedWorkbook || visibleSelectedCandidateQuestions.length === 0}
+              >
+                선택 문제 일괄 추가
+              </button>
+            </div>
           </div>
 
           {isQuestionLoading ? <p className="table-subtitle">문제은행을 불러오는 중입니다.</p> : null}
